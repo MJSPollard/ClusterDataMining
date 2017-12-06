@@ -285,7 +285,7 @@ public class UnsupervisedNetwork
 		{
 			return inputLayer;
 		}
-		public Neuron[][] getHiddenLayers()
+		public Neuron[] getHiddenLayers()
 		{
 			return hiddenLayers;
 		}
