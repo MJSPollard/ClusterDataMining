@@ -3,6 +3,7 @@ package project4;
 public class Particle
 {
 	private XYClass location, velocity;
+	private double fitness;
 
 	public Particle()
 	{
