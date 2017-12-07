@@ -2,9 +2,14 @@ package project4;
 
 public class Particle
 {
+	private XYClass location, velocity;
 
-
-
+	public Particle()
+	{
+		
+	}
+	
+	
 	private class XYClass
 	{
 		private double X, Y;

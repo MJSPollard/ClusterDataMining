@@ -27,13 +27,15 @@ public class UnsupervisedNetwork
 		
 		//We use ArrayList so that we can get the position of values
 		private int count, count2, i;
-		private Neuron[] inputLayer, outputLayer, hiddenLayers;
+		private double[] inputLayer;
+		private Neuron[]outputLayer, hiddenLayers;
 		//private ArrayList<Neuron[]> network;
 		private double l_rate, fitness;
 		private static final double momentum = .1;
 		private double error, prevError = 0;
 		//Used HashMap will be used to add fast indexing through the layers
-		private HashMap<Neuron,Integer> inputIndex, outputIndex, hiddenIndex;
+		private HashMap<Neuron,Integer> outputIndex, hiddenIndex;
+		private HashMap<Double, Integer> inputIndex;
 		//hiddenIndex is <Integer, HashMap>, Integer is hidden layer depth, Hashmap are indexes of the layer
 		private Random rand;
 		
@@ -68,8 +70,8 @@ public class UnsupervisedNetwork
 			//Initialize properties of UnsupervisedNetwork
 			this.l_rate = l_rate;
 			
-			inputLayer = new Neuron[inputSize];
-			inputIndex = new HashMap<Neuron,Integer>();
+			inputLayer = new double[inputSize];
+			inputIndex = new HashMap<Double,Integer>();
 			
 			hiddenLayers = new Neuron[hiddenSize];
 	 		hiddenIndex = new HashMap<Neuron, Integer>();
@@ -89,14 +91,13 @@ public class UnsupervisedNetwork
 			//Loop adds a Neuron object to the layer
 			for(i = 0; i < inputLayer.length; i++)
 			{
-	 			inputLayer[i] = new Neuron(0); 	 	//False because we don't want
-	 												//Sigmoid to activate on input layer
+	 			//inputLayer[i] = data
 	 		}									   	
 			
 
 			//loop places the Neuron as the HashMap key, with a value of its index
 			count = 0;
-	 		for(Neuron iter : inputLayer)
+	 		for(double iter : inputLayer)
 	 		{
 	 			this.inputIndex.put(iter, count);
 	 			count++;
@@ -106,28 +107,15 @@ public class UnsupervisedNetwork
 	 		//Because hiddenLayers may be multi-dimensional, we use two loops
 	 		for(i = 0; i < hiddenLayers.length; i++)
 	 		{
-	 			Neuron[] layer = new Neuron[hiddenLayers[i].length];
-	 			for(j = 0; j < layer.length; j++)
-	 			{
-	 				layer[j] = new Neuron(1);	//True, we want sigmoid activation
-	 				//layer[j].setBias(new Neuron(0));
-	 			}
-	 			hiddenLayers[i] = layer;
+ 				hiddenLayers[i] = new Neuron(1);	//True, we want sigmoid activation
 	 		}
 	 		
 	 		//Firstly creates a new HashMap of each Neuron as the key and its index
 	 		count = 0;
-	 		for(Neuron[] row : hiddenLayers)
+	 		for(Neuron neuron : hiddenLayers)
 	 		{
-	 			HashMap<Neuron,Integer> hid_layer = new HashMap<Neuron,Integer>();
-	 			count2 = 0;
-	 			for(Neuron neuron : row)
-	 			{
-	 				hid_layer.put(neuron, count2);
-	 				count2++;
-	 			}
 	 			//Secondly Maps the new hidden layer with its index as the key
-	 			hiddenIndex.put(count, hid_layer);
+	 			hiddenIndex.put(neuron, count);
 	 			count++;
 	 		}
 	 		
@@ -146,28 +134,12 @@ public class UnsupervisedNetwork
 	 		}
 	 		
 	 		//Connects the input layer to the first hidden layer with a random weight
-	 		for(Neuron input : inputLayer)
-	 		{
-	 			for(Neuron hidden : hiddenLayers[0])
-	 			{
-	 				input.setConnection(hidden, (rand.nextDouble() * 2 - 1) / 2);
-	 			}
-	 		}
 	 		//Connects hidden layers to the next hidden layer with a random weight
-	 		for(i = 0; i < hiddenLayers.length; i++)
-	 		{
 	 			//For every neuron in a layer, connect to every neuron in the next hidden layer
-	 			for(Neuron hidden : hiddenLayers[i])
-	 			{
-	 				if(i != hiddenLayers.length-1)
-	 				{
-		 				for(Neuron next_layer_hid : hiddenLayers[i+1])
-		 				{
-		 					hidden.setConnection(next_layer_hid, (rand.nextDouble() * 2 - 1) / 2);
-		 				}
-	 				}
-	 			}
-	 		}
+ 			for(Neuron hidden : hiddenLayers)
+ 			{
+ 				hidden.setConnection(, (rand.nextDouble() * 2 - 1) / 2);
+ 			}
 	 		//Connects neurons in last hiddenLayer to the outputLayer with a random weight
 	 		for(Neuron hidden : hiddenLayers[hiddenLayers.length-1])
 	 		{
