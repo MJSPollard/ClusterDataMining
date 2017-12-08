@@ -1,64 +1,92 @@
 package project4;
 
-import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Scanner;
+import java.util.StringTokenizer;
 
 public class Handler {
 
+	static Handler handler = new Handler();
 	Scanner scan = new Scanner(System.in);
 	double[][] data;
 
-	public static void main(String[] args) {
-		Handler handler = new Handler();
+	/**
+	 * Main method for program
+	 * 
+	 * @param args
+	 * @throws IOException
+	 */
+	public static void main(String[] args) throws IOException {
+
+
+		// checks the working directory
+		System.out.println("Working Directory = " + System.getProperty("user.dir"));
+
+		handler.DatasetMenu();
+		handler.normalizeData();
 		
+	//	handler.AlgorithmMenu();
 
-		// Get user options and read in file choice
-		String algorithm = handler.AlgorithmMenu();
-		String dataset = handler.DatasetMenu() + ".csv";
-
-		try {
-			Scanner file = new Scanner(new File(dataset));
-		} catch (Exception e) {
-			System.out.println("There was an error");
-		}
-
-		switch (dataset) {
-		case "papers2013.csv":
-			handler.data = handler.getDataSet(dataset, 123, 1);
-			break;
-		case "papers2014.csv":
-			handler.data = handler.getDataSet(dataset, 123, 1);
-			break;
-		case "gesturephase.csv":
-			handler.data = handler.getDataSet(dataset, 123, 1);
-			break;
-		case "htru_2.csv":
-			handler.data = handler.getDataSet(dataset, 17898, 8);
-			break;
-		case "electric.csv":
-			handler.data = handler.getDataSet(dataset, 123, 1);
-			break;
-
-		}
-
-		handler.printDataset();
 	}
 
-	public double[][] getDataSet(String file, int numInstances, int numAttributes) {
-		double dataInfo[][] = new double[numInstances][numAttributes];
+	/**
+	 * Method that reads in the csv to a 2d double type array
+	 * 
+	 * @param dataset
+	 * @param numInstances
+	 * @param numAttributes
+	 * @return the chosen data set in 2d array format
+	 * @throws IOException
+	 */
+	public double[][] getDataSet(String dataset, int numInstances, int numAttributes) throws IOException {
+		String[][] stringArray = new String[numInstances][numAttributes];
+		double[][] doubleArray = new double[numInstances][numAttributes];
+		Scanner inFile = new Scanner(new FileReader(dataset));
+		int i = 0;
+		int j = 0;
+		String line1;
+
+		// read in csv file to 2d string array
+		while (inFile.hasNextLine()) {
+			line1 = inFile.nextLine();
+			StringTokenizer st = new StringTokenizer(line1, ",", false);
+			j = 0;
+			while (st.hasMoreTokens()) {
+				stringArray[i][j] = st.nextToken();
+				j++;
+			}
+			i++;
+		}
+		inFile.close();
+
+		// converts string array to double array
+		for (i = 0; i < numInstances; i++) {
+			for (j = 0; j < numAttributes; j++) {
+				doubleArray[i][j] = Double.parseDouble(stringArray[i][j]);
+			}
+		}
+
+		// prints dataset - for testing purposes
+		for (i = 0; i < numInstances; i++) {
+			for (j = 0; j < numAttributes; j++) {
+				System.out.print(doubleArray[i][j] + " ");
+			}
+			System.out.println();
+		}
+
+		return doubleArray;
+	}
+	
+	public void printArray(){
 		
-		for(int i = 0; i < numInstances; i++) {
-			for(int j = 0; j < numAttributes; j++) {
-			
-			}		
-		}
-		return dataInfo;
 	}
 
-	public void printDataset() {
-
-	}
-
+	/**
+	 * This method lets the user choose the clustering algorithm to run.
+	 * 
+	 * @return
+	 */
 	public String AlgorithmMenu() {
 		int choice = 0;
 
@@ -86,30 +114,44 @@ public class Handler {
 
 	}
 
-	public String DatasetMenu() {
+	/**
+	 * This method lets the user choose the dataset to run.
+	 * 
+	 * @return the chosen dataset
+	 * @throws IOException
+	 */
+	public void DatasetMenu() throws IOException {
 		int choice = 0;
-		System.out.println("Enter the number of an Algorithm\n" + "1. papers2013\n" + "2. papers2014\n"
+		String dataSet = "";
+		System.out.println("Enter the number of a Dataset\n" + "1. papers2013\n" + "2. papers2014\n"
 				+ "3. gesturephase\n" + "4. htru_2\n" + "5. electric\n");
 		choice = Integer.parseInt(scan.nextLine());
 		switch (choice) {
 		case 1:
-			return "papers2013";
+			handler.data = handler.getDataSet("papers2013.csv", 17898, 9);
+			break;
 		case 2:
-			return "papers2014";
+			handler.data = handler.getDataSet("papers2014.csv", 17898, 9);
+			break;
 		case 3:
-			return "gesturephase";
+			handler.data = handler.getDataSet("gesturephase.csv", 17898, 9);
+			break;
 		case 4:
-			return "htru_2";
+			handler.data = handler.getDataSet("htru_2.csv", 17898, 9);
+			break;
 		case 5:
-			return "electric";
+			handler.data = handler.getDataSet("electric.csv", 17898, 9);
+			break;
 		default:
 			System.out.println("Input Error, try again");
 			DatasetMenu();
 			break;
 		}
-		return "Error, a datset wasn't chosen";
 	}
 
+	/**
+	 * Normalizes the data
+	 */
 	public void normalizeData() {
 
 	}
