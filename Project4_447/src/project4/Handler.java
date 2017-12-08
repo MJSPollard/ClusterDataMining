@@ -19,14 +19,12 @@ public class Handler {
 	 */
 	public static void main(String[] args) throws IOException {
 
-
 		// checks the working directory
 		System.out.println("Working Directory = " + System.getProperty("user.dir"));
-
 		handler.DatasetMenu();
 		handler.normalizeData();
-		
-	//	handler.AlgorithmMenu();
+		handler.AlgorithmMenu();
+		System.exit(1);
 
 	}
 
@@ -39,9 +37,9 @@ public class Handler {
 	 * @return the chosen data set in 2d array format
 	 * @throws IOException
 	 */
-	public double[][] getDataSet(String dataset, int numInstances, int numAttributes) throws IOException {
+	public void getDataSet(String dataset, int numInstances, int numAttributes) throws IOException {
 		String[][] stringArray = new String[numInstances][numAttributes];
-		double[][] doubleArray = new double[numInstances][numAttributes];
+		data = new double[numInstances][numAttributes];
 		Scanner inFile = new Scanner(new FileReader(dataset));
 		int i = 0;
 		int j = 0;
@@ -63,29 +61,34 @@ public class Handler {
 		// converts string array to double array
 		for (i = 0; i < numInstances; i++) {
 			for (j = 0; j < numAttributes; j++) {
-				doubleArray[i][j] = Double.parseDouble(stringArray[i][j]);
+				data[i][j] = Double.parseDouble(stringArray[i][j]);
 			}
 		}
 
-		// prints dataset - for testing purposes
-		for (i = 0; i < numInstances; i++) {
-			for (j = 0; j < numAttributes; j++) {
-				System.out.print(doubleArray[i][j] + " ");
-			}
-			System.out.println();
-		}
+		printArray(numInstances, numAttributes);
 
-		return doubleArray;
-	}
-	
-	public void printArray(){
-		
 	}
 
 	/**
-	 * This method lets the user choose the clustering algorithm to run.
+	 * Method to print data set for testing purposes
 	 * 
-	 * @return
+	 * @param numInstances
+	 * @param numAttributes
+	 */
+	public void printArray(int numInstances, int numAttributes) {
+		for (int i = 0; i < numInstances; i++) {
+			for (int j = 0; j < numAttributes; j++) {
+				System.out.print(data[i][j] + " ");
+			}
+			System.out.println();
+		}
+	}
+
+	/**
+	 * This method lets the user choose the clustering algorithm to run and
+	 * initializes needed things.
+	 * 
+	 * @return change this to be void and just call algorithms
 	 */
 	public String AlgorithmMenu() {
 		int choice = 0;
@@ -128,19 +131,19 @@ public class Handler {
 		choice = Integer.parseInt(scan.nextLine());
 		switch (choice) {
 		case 1:
-			handler.data = handler.getDataSet("papers2013.csv", 17898, 9);
+			handler.getDataSet("Project4_447/src/resources/papers2013.csv", 17898, 9);
 			break;
 		case 2:
-			handler.data = handler.getDataSet("papers2014.csv", 17898, 9);
+			handler.getDataSet("Project4_447/src/resources/papers2014.csv", 17898, 9);
 			break;
 		case 3:
-			handler.data = handler.getDataSet("gesturephase.csv", 17898, 9);
+			handler.getDataSet("Project4_447/src/resources/gesturephase.csv", 17898, 9);
 			break;
 		case 4:
-			handler.data = handler.getDataSet("htru_2.csv", 17898, 9);
+			handler.getDataSet("Project4_447/src/resources/htru_2.csv", 17898, 9);
 			break;
 		case 5:
-			handler.data = handler.getDataSet("electric.csv", 17898, 9);
+			handler.getDataSet("Project4_447/src/resources/electric.csv", 17898, 9);
 			break;
 		default:
 			System.out.println("Input Error, try again");
