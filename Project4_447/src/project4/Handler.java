@@ -24,8 +24,7 @@ public class Handler {
 		handler.DatasetMenu();
 		handler.normalizeData();
 		handler.AlgorithmMenu();
-		System.exit(1);
-
+		System.exit(0);
 	}
 
 	/**
@@ -90,7 +89,7 @@ public class Handler {
 	 * 
 	 * @return change this to be void and just call algorithms
 	 */
-	public String AlgorithmMenu() {
+	public void AlgorithmMenu() {
 		int choice = 0;
 
 		System.out.println("Enter the number of an Algorithm\n" + "1. K-Means\n" + "2. DB-Scan\n"
@@ -99,21 +98,25 @@ public class Handler {
 		choice = Integer.parseInt(scan.nextLine());
 		switch (choice) {
 		case 1:
-			return "K-Means";
+			//Kmeans kmeans = new Kmeans();
+			break;
 		case 2:
-			return "DB-Scan";
+			DBscan dbscan = new DBscan();
+			break;
 		case 3:
-			return "UnsupNetwork";
+			UnsupervisedNetwork un = new UnsupervisedNetwork(1, 1, 1, 1);
+			break;
 		case 4:
-			return "POS";
+			PSO pos = new PSO();
+			break;
 		case 5:
-			return "ACO";
+			ACO aco = new ACO();
+			break;
 		default:
 			System.out.println("Input Error, try again");
 			AlgorithmMenu();
 			break;
 		}
-		return "Error, an Algorithm wasn't chosen";
 
 	}
 
