@@ -106,7 +106,8 @@ public class UnsupervisedNetwork
 	 		{
 	 			int randomInstance = random.nextInt(data.length);
 	 			double[] randomData = data[randomInstance];
- 				hiddenLayers[i] = new Neuron(randomData, l_rate);	//True, we want sigmoid activation
+ 				hiddenLayers[i] = new Neuron(randomData, l_rate);
+ 				outputNeuron.setConnection(hiddenLayers[i]);
 	 		}
 	 		
 	 		//Firstly creates a new HashMap of each Neuron as the key and its index
@@ -138,19 +139,43 @@ public class UnsupervisedNetwork
 	         */
 		public void train(double[] input)
 		{
-			for(int i = 0; i < input.length; i++)
+			for(int i = 0; i < hiddenLayers.length; i++)
 			{
-				inputLayer[i] = input[i];
-				
+				hiddenLayers[i].setInput(input);
 			}
+//			for(int i = 0; i < input.length; i++)
+//			{
+//				inputLayer[i] = input[i];
+//			}
 		}
-		
 	        /**
 	         * Evaluates the output of the neurons using the softmax function
 	         */
-		private void evaluateOutput()
+		public void evaluateOutput()
 		{
-			//linear sum of all values produced ai * fi (||x - cj||)
+			outputNeuron.calculateOutput();
+			
+//			Neuron temp = outputNeuron.getWinner();
+//			double[] centers = temp.getCenters();
+//			for(int j = 0; j < centers.length; j++)
+//			{
+//				System.out.print("C: " + centers[j]);
+//			}
+//			System.out.println();
+//			double[] temp2 = temp.getTemp();
+//			for(int i = 0; i < temp2.length; i++)
+//			{
+//				System.out.print("D: " + temp2[i]);
+//			}
+//			System.out.println();
+		}
+		
+		public void allWins()
+		{
+			for(int i = 0; i < hiddenLayers.length; i++)
+			{
+				System.out.println(hiddenLayers[i].getWins());
+			}
 		}
 		
 		public void setFitness(double fit)
@@ -184,6 +209,7 @@ public class UnsupervisedNetwork
 			
 			public Neuron(double[] datapoint, double learning_rate)
 			{
+				centers = new double[datapoint.length];
 				lrate = learning_rate;
 				for(int i =0; i < datapoint.length; i++)
 				{
@@ -229,6 +255,16 @@ public class UnsupervisedNetwork
 			{
 				return winCount;
 			}
+			
+			public double[] getTemp()
+			{
+				double[] temp = new double[currentInput.length];
+				for(int i = 0; i < currentInput.length; i++)
+				{
+					temp[i] = currentInput[i] - centers[i];
+				}
+				return temp;
+			}
 		}
 		
 		/**
@@ -238,6 +274,8 @@ public class UnsupervisedNetwork
 		{
 			private int connectCounter, winnerIndex;
 			private double highest, output, sum;
+			private Synapses winner;
+			
 			private ArrayList<Synapses> connections; //Connections to every Neuron in the next layer
 			
 	                /**
@@ -246,6 +284,7 @@ public class UnsupervisedNetwork
 			public OutputNeuron()
 			{
 				connectCounter = 0;
+				connections = new ArrayList<Synapses>();
 			}
 			
 			public void setConnection(Neuron n)
@@ -273,13 +312,19 @@ public class UnsupervisedNetwork
 					}
 					i++;
 				}
+				updateWinner();
 			}
 			
 			public void updateWinner()
 			{
-				Synapses winner = connections.get(winnerIndex);
+				winner = connections.get(winnerIndex);
 				winner.updateWin();
 				winner.getConnector().updateCenters();
+			}
+			
+			public Neuron getWinner()
+			{
+				return winner.getConnector();
 			}
 			
 		}

@@ -65,7 +65,7 @@ public class Handler {
 			}
 		}
 
-		printArray(numInstances, numAttributes);
+		//printArray(numInstances, numAttributes);
 
 	}
 
@@ -107,7 +107,12 @@ public class Handler {
 		case 3:
 			UnsupervisedNetwork un = new UnsupervisedNetwork(data[0].length, 2, .02);
 			un.initLayers(data);
-			
+			for(int i = 0; i < data.length; i++)
+			{
+				un.train(data[i]);
+				un.evaluateOutput();
+			}
+			un.allWins();
 			break;
 		case 4:
 			PSO pos = new PSO();
@@ -146,7 +151,7 @@ public class Handler {
 			handler.getDataSet("Project4_447/src/resources/gesturephase.csv", 17898, 9);
 			break;
 		case 4:
-			handler.getDataSet("Project4_447/src/resources/htru_2.csv", 17898, 9);
+			handler.getDataSet("htru_2.csv", 17898, 9);
 			break;
 		case 5:
 			handler.getDataSet("Project4_447/src/resources/electric.csv", 17898, 9);
@@ -162,23 +167,23 @@ public class Handler {
 	 * Normalizes the data
 	 */
 	public  void normalizeData() {
-		handler.data = transpose(handler.data);
+		double[][] tempData = transpose(handler.data);
 		
 		count = 0;
 
-        for (double[] instance : handler.data)
+        for (double[] instance : tempData)
         {
-            double[] instanceData = new double[handler.data.length];
+            double[] instanceData = new double[instance.length];
             
             for (int i = 0; i < instance.length; i++)
             {
                 instanceData[i] = instance[i];
             }
-            data[handler.count] = handler.normalize(instanceData);
-            handler.count++;
+            tempData[count] = handler.normalize(instanceData);
+            count++;
         }
 
-        data = transpose(data);
+        data = transpose(tempData);
 	}
 	
     /**
