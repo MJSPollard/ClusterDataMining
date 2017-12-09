@@ -28,17 +28,17 @@ public class UnsupervisedNetwork
 		//We use ArrayList so that we can get the position of values
 		private int count;
 		private double[] inputLayer;
-		private RBF[] hiddenLayers;
+		private Neuron[] hiddenLayers;
 		private OutputNeuron outputNeuron;
 		//private ArrayList<Neuron[]> network;
 		private double l_rate, fitness;
 		private static final double momentum = .1;
 		private double error, prevError = 0;
 		//Used HashMap will be used to add fast indexing through the layers
-		private HashMap<RBF,Integer> hiddenIndex;
+		private HashMap<Neuron,Integer> hiddenIndex;
 		private HashMap<Double, Integer> inputIndex;
 		//hiddenIndex is <Integer, HashMap>, Integer is hidden layer depth, Hashmap are indexes of the layer
-		private Random rand;
+		private Random random;
 		
 	        /**
 	         * The constructor for neural network - sets appropriate value for clone
@@ -65,7 +65,7 @@ public class UnsupervisedNetwork
 	         */
 		public UnsupervisedNetwork(int inputSize, int outputSize, int hiddenSize, double l_rate)
 		{
-			rand = new Random(420);
+			random = new Random(420);
 			//network = new ArrayList<Neuron[]>();
 			//Initialize properties of UnsupervisedNetwork
 			this.l_rate = l_rate;
@@ -73,18 +73,18 @@ public class UnsupervisedNetwork
 			inputLayer = new double[inputSize];
 			inputIndex = new HashMap<Double,Integer>();
 			
-			hiddenLayers = new RBF[hiddenSize];
-	 		hiddenIndex = new HashMap<RBF, Integer>();
+			hiddenLayers = new Neuron[hiddenSize];
+	 		hiddenIndex = new HashMap<Neuron, Integer>();
 	 		
 	 		outputNeuron = new OutputNeuron();
 	 		
-	 		initLayers();
+	 		random = new Random(420);
 		}
 		
 	        /**
 	         * This method is used to initialize all of the layers of the MLP
 	         */
-		public void initLayers()
+		public void initLayers(double[][] data)
 		{
 			int i,j;
 			//Loop adds a Neuron object to the layer
@@ -106,12 +106,14 @@ public class UnsupervisedNetwork
 	 		//Because hiddenLayers may be multi-dimensional, we use two loops
 	 		for(i = 0; i < hiddenLayers.length; i++)
 	 		{
- 				hiddenLayers[i] = new RBF();	//True, we want sigmoid activation
+	 			int randomInstance = random.nextInt(data.length);
+	 			double[] randomData = data[randomInstance];
+ 				hiddenLayers[i] = new Neuron(randomData, l_rate);	//True, we want sigmoid activation
 	 		}
 	 		
 	 		//Firstly creates a new HashMap of each Neuron as the key and its index
 	 		count = 0;
-	 		for(RBF neuron : hiddenLayers)
+	 		for(Neuron neuron : hiddenLayers)
 	 		{
 	 			//Secondly Maps the new hidden layer with its index as the key
 	 			hiddenIndex.put(neuron, count);
@@ -162,7 +164,7 @@ public class UnsupervisedNetwork
 		{
 			return inputLayer;
 		}
-		public RBF[] getHiddenLayers()
+		public Neuron[] getHiddenLayers()
 		{
 			return hiddenLayers;
 		}
@@ -176,14 +178,58 @@ public class UnsupervisedNetwork
 			return fitness;
 		}
 		
+		public class Neuron
+		{
+			private double output, lrate;
+			private double[] centers, currentInput;
+			
+			public Neuron(double[] datapoint, double learning_rate)
+			{
+				lrate = learning_rate;
+				for(int i =0; i < datapoint.length; i++)
+				{
+					centers[i] = datapoint[i];
+				}
+			}
+			
+			public void setInput(double[] input)
+			{
+				output = 0;
+				currentInput = input;
+				for(int i = 0; i < input.length; i++)
+				{
+					output += currentInput[i] * centers[i];
+				}
+			}
+			
+			public double getOutput()
+			{
+				return output;
+			}
+			
+			public double[] getCenters()
+			{
+				return centers;
+			}
+			
+			public void updateCenters()
+			{
+				for(int i = 0; i < currentInput.length; i++)
+				{
+					centers[i] = lrate * (currentInput[i] - centers[i]);
+				}
+			}
+			
+			
+		}
+		
 		/**
-	         * Class for the Neurons that make up part of the MLP 
-	         */
+         * Class for the Neurons that make up part of the MLP 
+         */
 		public class OutputNeuron
 		{
-			private int best, connectCounter, winnerIndex;
+			private int connectCounter, winnerIndex;
 			private double highest, output, sum;
-			private Synapses biasSynapse;
 			private ArrayList<Synapses> connections; //Connections to every Neuron in the next layer
 			
 	                /**
@@ -192,15 +238,14 @@ public class UnsupervisedNetwork
 			public OutputNeuron()
 			{
 				connectCounter = 0;
-				best = 0;
 			}
 			
-			public void setConnection(RBF n, double weight)
+			public void setConnection(Neuron n)
 			{
 				/*
 				 * sets connections & the weights associated with them
 				 */
-				connections.add(new Synapses(n, weight));
+				connections.add(new Synapses(n));
 				connectCounter++;
 			}
 			
@@ -211,9 +256,9 @@ public class UnsupervisedNetwork
 				int i = 0;
 				for(Synapses synapse: connections)
 				{
-					output = synapse.getOutput();
+					output = synapse.getConnector().getOutput();
 					sum += output;
-					if(synapse.getOutput() > highest)
+					if(synapse.getConnector().getOutput() > highest)
 					{
 						highest = output;
 						winnerIndex = i;
@@ -222,64 +267,33 @@ public class UnsupervisedNetwork
 				}
 			}
 			
+			public void updateWinner()
+			{
+				Synapses winner = connections.get(winnerIndex);
+				winner.getConnector().updateCenters();
+			}
+			
 		}
 		
-	        /**
-	         * Private class Synapses represents a connection to a neuron
+        /**
+         * Private class Synapses represents a connection to a neuron
 		 * and associates a weight with this connection
 		 * @param Neuron n The connecting Neuron
-	         * @param double weight The weight associated with the connection
-	        */
+         * @param double weight The weight associated with the connection
+         */
+
 		public class Synapses
 		{		
-			private RBF connected;
-			private double weight, deltaW, prevDeltaW;
+			private Neuron connected;
 			
-			public Synapses(RBF neuron, double weight)
+			public Synapses(Neuron neuron)
 			{
 				this.connected = neuron;
-				this.weight = weight;
 			}
 			
-			public double getOutput()
-			{
-				return connected.getOutput() * weight;
-			}
-			
-			public double getWeight()
-			{
-				return weight;
-			}
-			
-			public void adjustWeight(double weight)
-			{
-				this.weight = weight;
-			}
-			
-			public RBF getConnector()
+			public Neuron getConnector()
 			{
 				return connected;
-			}
-			
-			public void setDelta(double delta)
-			{
-				prevDeltaW = deltaW;
-				deltaW = delta;
-			}
-			
-			public double getDelta()
-			{
-				return deltaW;
-			}
-			
-			public double getPrevDeltaW()
-			{
-				return prevDeltaW;
-			}
-			public String toString(){
-				String line = "";
-				line += weight;
-				return line;
 			}
 		}
 	}
