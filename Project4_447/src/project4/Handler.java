@@ -9,6 +9,7 @@ public class Handler {
 
 	static Handler handler = new Handler();
 	Scanner scan = new Scanner(System.in);
+	int count;
 	double[][] data;
 
 	/**
@@ -104,13 +105,15 @@ public class Handler {
 			DBscan dbscan = new DBscan();
 			break;
 		case 3:
-			UnsupervisedNetwork un = new UnsupervisedNetwork(1, 1, 1, 1);
+			UnsupervisedNetwork un = new UnsupervisedNetwork(data[0].length, 2, .02);
+			un.initLayers(data);
+			
 			break;
 		case 4:
 			PSO pos = new PSO();
 			break;
 		case 5:
-			ACO aco = new ACO();
+//			ACO aco = new ACO();
 			break;
 		default:
 			System.out.println("Input Error, try again");
@@ -158,8 +161,99 @@ public class Handler {
 	/**
 	 * Normalizes the data
 	 */
-	public void normalizeData() {
+	public  void normalizeData() {
+		handler.data = transpose(handler.data);
+		
+		count = 0;
 
+        for (double[] instance : handler.data)
+        {
+            double[] instanceData = new double[handler.data.length];
+            
+            for (int i = 0; i < instance.length; i++)
+            {
+                instanceData[i] = instance[i];
+            }
+            data[handler.count] = handler.normalize(instanceData);
+            handler.count++;
+        }
+
+        data = transpose(data);
 	}
+	
+    /**
+     * Used in assistance to normalize data
+     * @param array the array to be transposed
+     * @return the transposed array
+     */
+
+    public double[][] transpose(double[][] array)
+    {
+        if (array == null || array.length == 0)
+        {
+            return array;
+        }
+
+        double[][] newArray = new double[array[0].length][array.length];
+
+        for (int x = 0; x < newArray[0].length; x++)
+        {
+            for (int y = 0; y < newArray.length; y++)
+            {
+                newArray[y][x] = array[x][y];
+            }
+        }
+        return newArray;
+    }
+
+    /**
+     * This method normalizes the data set using Zero-mean, unit variance
+     * Formual: x' = xi - xavg / standard deviation
+     *
+     * @param data the data that is not yet normalized
+     * @return the new normalized data set
+     */
+    public double[] normalize(double[] data)
+    {
+        double sum = 0;
+        double mean = 0;
+        double meanSum = 0;
+        double stdDev = 0;
+
+        double[] newData = new double[data.length];
+
+        for (int j = 0; j < 4; j++)
+        {
+            if (j == 1)
+            {
+                mean = sum / data.length;
+            }
+            for (int i = 0; i < data.length; i++)
+            {
+                switch (j)
+                {
+                    case 0:
+                        sum += data[i];
+                        break;
+
+                    case 1:
+                        meanSum += Math.pow((data[i] - mean), 2);
+                        break;
+
+                    case 2:
+                        stdDev = Math.sqrt((meanSum / data.length));
+                        break;
+
+                    case 3:
+                        newData[i] = (data[i] - mean) / stdDev;
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        }
+        return newData;
+    }
 
 }

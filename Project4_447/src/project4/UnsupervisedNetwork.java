@@ -32,8 +32,6 @@ public class UnsupervisedNetwork
 		private OutputNeuron outputNeuron;
 		//private ArrayList<Neuron[]> network;
 		private double l_rate, fitness;
-		private static final double momentum = .1;
-		private double error, prevError = 0;
 		//Used HashMap will be used to add fast indexing through the layers
 		private HashMap<Neuron,Integer> hiddenIndex;
 		private HashMap<Double, Integer> inputIndex;
@@ -63,7 +61,7 @@ public class UnsupervisedNetwork
 	         * @param depth the amount of hidden layers
 	         * @param l_rate the rate at which an algorithm learns
 	         */
-		public UnsupervisedNetwork(int inputSize, int outputSize, int hiddenSize, double l_rate)
+		public UnsupervisedNetwork(int inputSize, int hiddenSize, double l_rate)
 		{
 			random = new Random(420);
 			//network = new ArrayList<Neuron[]>();
@@ -143,8 +141,8 @@ public class UnsupervisedNetwork
 			for(int i = 0; i < input.length; i++)
 			{
 				inputLayer[i] = input[i];
+				
 			}
-			//check output??
 		}
 		
 	        /**
@@ -182,6 +180,7 @@ public class UnsupervisedNetwork
 		{
 			private double output, lrate;
 			private double[] centers, currentInput;
+			private int winCount;
 			
 			public Neuron(double[] datapoint, double learning_rate)
 			{
@@ -216,11 +215,20 @@ public class UnsupervisedNetwork
 			{
 				for(int i = 0; i < currentInput.length; i++)
 				{
-					centers[i] = lrate * (currentInput[i] - centers[i]);
+					double delta = lrate * (currentInput[i] - centers[i]);
+					centers[i] += delta;
 				}
 			}
 			
+			public void addWin()
+			{
+				winCount++;
+			}
 			
+			public int getWins()
+			{
+				return winCount;
+			}
 		}
 		
 		/**
@@ -270,6 +278,7 @@ public class UnsupervisedNetwork
 			public void updateWinner()
 			{
 				Synapses winner = connections.get(winnerIndex);
+				winner.updateWin();
 				winner.getConnector().updateCenters();
 			}
 			
@@ -294,6 +303,16 @@ public class UnsupervisedNetwork
 			public Neuron getConnector()
 			{
 				return connected;
+			}
+			
+			public void updateWin()
+			{
+				connected.addWin();
+			}
+			
+			public int getWins()
+			{
+				return connected.getWins();
 			}
 		}
 	}
