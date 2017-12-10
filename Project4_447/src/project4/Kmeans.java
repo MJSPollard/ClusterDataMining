@@ -1,12 +1,15 @@
 package project4;
 
 import java.util.Random;
+import java.util.ArrayList;
 
 //supposed to be really fast
 public class Kmeans {
 
 	double data[][];
 	int clusterNum;
+	ArrayList<Double> cluster1 = new ArrayList<Double>();
+	ArrayList<Double> cluster2 = new ArrayList<Double>();
 
 	/**
 	 * Constructor for the K means clustering algorithm
@@ -18,6 +21,7 @@ public class Kmeans {
 		this.data = data;
 		this.clusterNum = clusterNum;
 		int maxIterations = 30;
+
 		int i = 0;
 
 		if (data.length == 0) {
@@ -29,20 +33,25 @@ public class Kmeans {
 			System.exit(0);
 		}
 
-		//mark the time and alert user
+		// mark the time and alert user
 		long startTime = System.currentTimeMillis();
 		System.out.println("K-Means clustering started");
 
-		//set up initial requirements
-		initializeCenters(data, clusterNum);
-		calculateDistance();
-		clusterAssignment();
-		
-		
-		while(i < maxIterations) {
+		// initialize random centers and assign the rest of the data to a cluster
+		// according to the distance from centers
+		calculateDistance(data, clusterNum, initializeCenters(data, clusterNum));
+
+		//prints size of initial clusters with no centroid updates
+		System.out.println("cluster1 size = " + cluster1.size());
+		System.out.println("cluster2 size = " + cluster2.size());
+
+		while (i < maxIterations) {
 			
 			i++;
 		}
+		
+		long endTime = System.currentTimeMillis();
+		System.out.println("K-Means performed in " + (endTime - startTime) + " ms");
 
 	}
 
@@ -84,21 +93,91 @@ public class Kmeans {
 
 	}
 
+	/**
+	 * calculates the distance of each point to the center of a cluster
+	 * 
+	 * @param data
+	 * @param clusterNum
+	 * @param clusterCenters
+	 * @return
+	 */
+	public double calculateDistance(double[][] data, int clusterNum, double[][] clusterCenters) {
+		int finalDistance = 0;
+		double dataSum = 0;
+		double dataAvg = 0;
+		double cenSum = 0;
+		double cenAvg = 0;
+		double closest = 10000;
+		int dataIndex = 0;
+		int centerIndex = 0;
+		ArrayList<Double> cenList = new ArrayList<Double>();
+		ArrayList<Double> dataList = new ArrayList<Double>();
 
-	public void clusterAssignment(double[][] data, int clusterNum) {
-		double[][] clusterCenters = new double[clusterNum][];
-		
-		for (int i = 0; i < clusterNum; i++) {
-			double[] num = new double[data[0].length];
-			for (int j = 0; j < num.length; j++) {
-				
+		// uses averages to compare the distances between the centers and the data
+		// this method was implemented as there didn't seem to be a best option - based
+		// off of no free lunch principle
+		for (int instanceIT = 0; instanceIT < clusterCenters.length; instanceIT++) {
+			for (int attrIT = 0; attrIT < clusterCenters[0].length; attrIT++) {
+				cenSum += clusterCenters[instanceIT][attrIT];
 			}
-			clusterCenters[i] = num;
+			cenAvg = (cenSum / clusterCenters[0].length);
+			cenList.add(cenAvg);
+			cenSum = 0;
 		}
+
+		// for (int i = 0; i < cenList.size(); i++) {
+		// System.out.println(cenList.get(i));
+		// }
+		// System.out.println("cen size = " + cenList.size());
+
+		for (int instanceIT = 0; instanceIT < data.length; instanceIT++) {
+			for (int attrIT = 0; attrIT < data[0].length; attrIT++) {
+				dataSum += data[instanceIT][attrIT];
+			}
+			dataAvg = (dataSum / data[0].length);
+			dataList.add(dataAvg);
+			dataSum = 0;
+		}
+
+		// for (int i = 0; i < dataList.size(); i++) {
+		// System.out.println(dataList.get(i));
+		// }
+		// System.out.println("data size = " + dataList.size());
+
+		// calculate which center point the data is closest too
+		for (int i = 0; i < data.length; i++) {
+			closest = 10000;
+			for (int j = 0; j < clusterNum; j++) {
+				double num = Math.abs(cenList.get(j) - dataList.get(i));
+
+				if (num < closest) {
+					closest = num;
+					dataIndex = i;
+					centerIndex = j;
+					// System.out.println("j = " + j);
+				}
+			}
+			assignToCluster(cenList.get(centerIndex), dataList.get(dataIndex), centerIndex);
+		}
+
+		return finalDistance;
 	}
-	
-	public void calculateDistances() {
-		
+
+	/**
+	 * assigns the data to a specific cluster
+	 * 
+	 * @param cenValue
+	 * @param dataVal
+	 * @param centerIndex
+	 */
+	public void assignToCluster(double cenValue, double dataVal, int centerIndex) {
+		// System.out.println(dataVal);
+		if (centerIndex == 0) {
+			cluster1.add(dataVal);
+		}
+		if (centerIndex == 1) {
+			cluster2.add(dataVal);
+		}
 	}
 
 	public void updateCenters() {
