@@ -111,14 +111,18 @@ public class ACO
 	private void probTo(Ant ant)
 	{
 		int currentCity = ant.getCurrentCity();
+		System.out.println(currentCity);
 
 		double lower = 0.0;
 
 		for (int i = 0; i < size; i++)
 		{
+			System.out.print(i);
 			if (!ant.visited(i))
 			{
-				lower += Math.pow(edges[currentCity][i], 1) * Math.pow(1 / graph[currentCity][i], 5);
+				double one = Math.pow(edges[currentCity][i], 1);
+				double two = Math.pow(1 / graph[currentCity][i], 5);
+				lower += one * two;
 			}
 
 		}

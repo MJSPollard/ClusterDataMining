@@ -28,7 +28,7 @@ public class Ant
 	
 	public int getCurrentCity()
 	{
-		return trail.get(trail.size());
+		return trail.get(trail.size()-1);
 	}
     public int trailLength()
     {

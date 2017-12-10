@@ -238,6 +238,7 @@ public class Handler {
             }
             for (int i = 0; i < data.length; i++)
             {
+            	//Switches based upon section of function to run
                 switch (j)
                 {
                     case 0:
