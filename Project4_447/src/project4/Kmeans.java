@@ -84,15 +84,24 @@ public class Kmeans {
 
 	}
 
-	public void calculateDistance() {
 
+	public void clusterAssignment(double[][] data, int clusterNum) {
+		double[][] clusterCenters = new double[clusterNum][];
+		
+		for (int i = 0; i < clusterNum; i++) {
+			double[] num = new double[data[0].length];
+			for (int j = 0; j < num.length; j++) {
+				
+			}
+			clusterCenters[i] = num;
+		}
+	}
+	
+	public void calculateDistances() {
+		
 	}
 
-	public void clusterAssignment() {
-
-	}
-
-	public void calculateCenters() {
+	public void updateCenters() {
 
 	}
 
