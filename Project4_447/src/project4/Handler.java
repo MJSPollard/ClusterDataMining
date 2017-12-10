@@ -120,7 +120,8 @@ public class Handler {
 			PSO pos = new PSO();
 			break;
 		case 5:
-//			ACO aco = new ACO();
+			ACO aco = new ACO(data);
+			aco.solve();
 			break;
 		default:
 			System.out.println("Input Error, try again");
@@ -150,10 +151,10 @@ public class Handler {
 			handler.getDataSet("Project4_447/src/resources/papers2014.csv", 17898, 9);
 			break;
 		case 3:
-			handler.getDataSet("Project4_447/src/resources/gesturephase.csv", 17898, 9);
+			handler.getDataSet("src/resources/wine_big.csv", 4898, 12);
 			break;
 		case 4:
-			handler.getDataSet("Project4_447/src/resources/htru_2.csv", 17898, 9);
+			handler.getDataSet("src/resources/htru_2.csv", 17898, 9);
 			break;
 		case 5:
 			handler.getDataSet("Project4_447/src/resources/electric.csv", 17898, 9);

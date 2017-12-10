@@ -6,7 +6,6 @@ public class Ant
 {
 	private ArrayList<Integer> trail;
 	private boolean[] visited;
-	private int curCity;
 	
 	public Ant(int instances, int attributes)
 	{
@@ -16,7 +15,8 @@ public class Ant
 		visited = new boolean[instances];
 	}
 	
-	public void visitCity(int city){
+	public void visitCity(int city)
+	{
 	    trail.add(city);
 	    visited[city] = true;
 	}
@@ -28,7 +28,7 @@ public class Ant
 	
 	public int getCurrentCity()
 	{
-		return trail.lastIndexOf(trail);
+		return trail.get(trail.size());
 	}
     public int trailLength()
     {

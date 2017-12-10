@@ -9,35 +9,39 @@ public class ACO
 	private final int TotalAnts;
 	private Ant[] ants;
 	private double[] probability;
-	private int activeAnts, size, bestLength, maxIterations;
+	private int size, bestLength, maxIterations;
 	private Random random;
 	private int[] bestTour;
 
 	public ACO(double[][] data)
 	{
 		random = new Random(420);
-		activeAnts = 0;
 		graph = data;
 		size = graph.length;
 		edges = new double[size][size];
 		TotalAnts = (int) (size * .8);
 		probability = new double[size];
-	}
-
-	public void initialize()
-	{
+		
 		ants = new Ant[TotalAnts];
 		for (int i = 0; i < TotalAnts; i++)
 		{
 			ants[i] = new Ant(size, size);
 		}
-
-		setupAnts();
-
-		for (int i = 0; i < size; i++)
-			for (int j = 0; j < size; j++)
-				edges[i][j] = 1.0;
+		
+		maxIterations = 500;
 	}
+
+//	public void initialize()
+//	{
+//		ants = new Ant[TotalAnts];
+//		for (int i = 0; i < TotalAnts; i++)
+//		{
+//			ants[i] = new Ant(size, size);
+//		}
+//
+//		setupAnts();
+//		clearEdges();
+//	}
 	
 	private void setupAnts()
 	{
@@ -45,6 +49,17 @@ public class ACO
 		{
 			ants[i].clear();
 			ants[i].visitCity(random.nextInt(size));
+		}
+	}
+	
+	private void clearEdges()
+	{
+		for (int i = 0; i < size; i++)
+		{
+			for (int j = 0; j < size; j++)
+			{
+				edges[i][j] = 1.0;
+			}
 		}
 	}
 
@@ -162,14 +177,7 @@ public class ACO
 
 	public int[] solve()
 	{
-		// clear trails
-		for (int i = 0; i < size; i++)
-		{
-			for (int j = 0; j < size; j++)
-			{
-				edges[i][j] = 1.0;
-			}
-		}
+		clearEdges();
 
 		int iter = 0;
 		// run for maxIterations
