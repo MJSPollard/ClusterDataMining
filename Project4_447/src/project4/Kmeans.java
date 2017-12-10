@@ -10,6 +10,8 @@ public class Kmeans {
 	int clusterNum;
 	ArrayList<Double> cluster1 = new ArrayList<Double>();
 	ArrayList<Double> cluster2 = new ArrayList<Double>();
+	ArrayList<Double> cenList = new ArrayList<Double>();
+	ArrayList<Double> dataList = new ArrayList<Double>();
 
 	/**
 	 * Constructor for the K means clustering algorithm
@@ -41,15 +43,19 @@ public class Kmeans {
 		// according to the distance from centers
 		calculateDistance(data, clusterNum, initializeCenters(data, clusterNum));
 
-		//prints size of initial clusters with no centroid updates
+		// prints size of initial clusters with no centroid updates
+		System.out.println("Iteration number: 1");
 		System.out.println("cluster1 size = " + cluster1.size());
 		System.out.println("cluster2 size = " + cluster2.size());
 
-		while (i < maxIterations) {
-			
+		while (i < maxIterations) {		
+			updateCenters();
+			System.out.println("Iteration number: " + (i+2));
+			System.out.println("cluster1 size = " + cluster1.size());
+			System.out.println("cluster2 size = " + cluster2.size());
 			i++;
 		}
-		
+
 		long endTime = System.currentTimeMillis();
 		System.out.println("K-Means performed in " + (endTime - startTime) + " ms");
 
@@ -107,11 +113,6 @@ public class Kmeans {
 		double dataAvg = 0;
 		double cenSum = 0;
 		double cenAvg = 0;
-		double closest = 10000;
-		int dataIndex = 0;
-		int centerIndex = 0;
-		ArrayList<Double> cenList = new ArrayList<Double>();
-		ArrayList<Double> dataList = new ArrayList<Double>();
 
 		// uses averages to compare the distances between the centers and the data
 		// this method was implemented as there didn't seem to be a best option - based
@@ -139,14 +140,24 @@ public class Kmeans {
 			dataSum = 0;
 		}
 
+		getClosest(cenList, dataList);
 		// for (int i = 0; i < dataList.size(); i++) {
 		// System.out.println(dataList.get(i));
 		// }
 		// System.out.println("data size = " + dataList.size());
 
-		// calculate which center point the data is closest too
+		return finalDistance;
+	}
+
+	/**
+	 * Calculates which centroid the data is closest too
+	 */
+	public void getClosest(ArrayList<Double> cenList, ArrayList<Double> dataList) {
+		int dataIndex = 0;
+		int centerIndex = 0;
+
 		for (int i = 0; i < data.length; i++) {
-			closest = 10000;
+			double closest = 10000; // set to arbitrarily high number to be overwritten immediately
 			for (int j = 0; j < clusterNum; j++) {
 				double num = Math.abs(cenList.get(j) - dataList.get(i));
 
@@ -154,13 +165,11 @@ public class Kmeans {
 					closest = num;
 					dataIndex = i;
 					centerIndex = j;
-					// System.out.println("j = " + j);
 				}
 			}
 			assignToCluster(cenList.get(centerIndex), dataList.get(dataIndex), centerIndex);
 		}
 
-		return finalDistance;
 	}
 
 	/**
@@ -180,18 +189,49 @@ public class Kmeans {
 		}
 	}
 
+	/**
+	 * update center locations in the data
+	 */
 	public void updateCenters() {
+		int clusterSum = 0;
+		int clusterAvg = 0;
+		int newCenterIndex = 0;
+		// empty the list of centers to update
+		cenList.clear();
 
+		// get actual average of cluster
+		for (int i = 0; i < cluster1.size(); i++) {
+			clusterSum += cluster1.get(i);
+		}
+		clusterAvg = clusterSum / cluster1.size();
+		clusterSum = 0;
+
+		// find actual average data point in cluster
+		double closest = 1000;
+		for (int i = 0; i < cluster1.size(); i++) {
+			double num = Math.abs(clusterAvg - cluster1.get(i));
+			if (num < closest) {
+				closest = num;
+				newCenterIndex = i;
+			}
+		}
+		cenList.add(cluster1.get(newCenterIndex)); // add new center to the list of centers
+		cluster1.clear(); // reset clusters to be overwritten
+
+		closest = 10000;
+		for (int i = 0; i < cluster2.size(); i++) {
+			double num = Math.abs(clusterAvg - cluster2.get(i));
+			if (num < closest) {
+				closest = num;
+				newCenterIndex = i;
+			}
+		}
+		cenList.add(cluster2.get(newCenterIndex)); // add new center to the list of centers
+		cluster2.clear(); // reset clusters to be overwritten
+		
+		getClosest(cenList, dataList);
+		
+		
 	}
 
-	//
-	// public void updateclusterCenters() {
-	//
-	// }
-	//
-
-	//
-	// public void convergence() {
-	//
-	// }
 }
