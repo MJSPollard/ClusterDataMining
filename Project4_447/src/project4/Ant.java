@@ -8,9 +8,12 @@ public class Ant
 	private boolean[] visited;
 	private int curCity;
 	
-	public Ant(int mapSize)
+	public Ant(int instances, int attributes)
 	{
-		visited = new boolean[mapSize];
+		visited = new boolean[instances * attributes];
+       // public int trail[] = new int[graph.length];
+		trail = new ArrayList<Integer>();
+		visited = new boolean[instances];
 	}
 	
 	public void visitCity(int city){
@@ -23,11 +26,20 @@ public class Ant
 	    return visited[i];
 	}
 	 
-	public double trailLength(double graph[][]) {
-	    double length = graph[trail[trailSize - 1]][trail[0]];
-	    for (int i = 0; i < trailSize - 1; i++) {
-	        length += graph[trail[i]][trail[i + 1]];
-	    }
-	    return length;
-	}
+    public double tourLength() {
+        double length = graph[tour[n - 1]][tour[0]];
+        for (int i = 0; i < n - 1; i++) {
+            length += graph[tour[i]][tour[i + 1]];
+        }
+        return length;
+    }
+
+    public void clear()
+    {
+        for (int i = 0; i < visited.length; i++)
+        {
+            visited[i] = false;
+        }
+        trail = new ArrayList<Integer>();
+    }
 }
