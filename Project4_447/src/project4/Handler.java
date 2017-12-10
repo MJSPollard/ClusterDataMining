@@ -24,6 +24,8 @@ public class Handler {
 		System.out.println("Working Directory = " + System.getProperty("user.dir"));
 		handler.DatasetMenu();
 		handler.normalizeData();
+		System.out.println("Data has been normalized");
+	//	handler.printArray();
 		handler.AlgorithmMenu();
 		System.exit(0);
 	}
@@ -65,7 +67,7 @@ public class Handler {
 			}
 		}
 
-		//printArray(numInstances, numAttributes);
+	//	printArray();
 
 	}
 
@@ -75,9 +77,9 @@ public class Handler {
 	 * @param numInstances
 	 * @param numAttributes
 	 */
-	public void printArray(int numInstances, int numAttributes) {
-		for (int i = 0; i < numInstances; i++) {
-			for (int j = 0; j < numAttributes; j++) {
+	public void printArray() {
+		for (int i = 0; i < data.length; i++) {
+			for (int j = 0; j < data[0].length; j++) {
 				System.out.print(data[i][j] + " ");
 			}
 			System.out.println();
@@ -99,7 +101,7 @@ public class Handler {
 		choice = Integer.parseInt(scan.nextLine());
 		switch (choice) {
 		case 1:
-			//Kmeans kmeans = new Kmeans();
+			Kmeans kmeans = new Kmeans(data, 2);
 			break;
 		case 2:
 			DBscan dbscan = new DBscan();
@@ -151,7 +153,7 @@ public class Handler {
 			handler.getDataSet("Project4_447/src/resources/gesturephase.csv", 17898, 9);
 			break;
 		case 4:
-			handler.getDataSet("htru_2.csv", 17898, 9);
+			handler.getDataSet("Project4_447/src/resources/htru_2.csv", 17898, 9);
 			break;
 		case 5:
 			handler.getDataSet("Project4_447/src/resources/electric.csv", 17898, 9);
