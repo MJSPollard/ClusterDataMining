@@ -25,13 +25,20 @@ public class Ant
 	{
 	    return visited[i];
 	}
-	 
-    public double tourLength() {
-        double length = graph[tour[n - 1]][tour[0]];
-        for (int i = 0; i < n - 1; i++) {
-            length += graph[tour[i]][tour[i + 1]];
-        }
-        return length;
+	
+	public int getCurrentCity()
+	{
+		return trail.lastIndexOf(trail);
+	}
+    public int trailLength()
+    {
+        return trail.size();
+    }
+    
+    public int[] getTrail()
+    {
+    	int[] arrayTrail = convertToArray(trail);
+    	return arrayTrail;
     }
 
     public void clear()
@@ -41,5 +48,25 @@ public class Ant
             visited[i] = false;
         }
         trail = new ArrayList<Integer>();
+    }
+    
+    /**
+     * Converts a Integer arraylist into a int array
+     * @param intList the current Integer arraylist
+     * @return the new int array
+     */
+    public static int[] convertToArray(ArrayList<Integer> intList)
+    {
+        int[] result = new int[intList.size()];
+        for (int i = 0; i < intList.size(); i++)
+        {
+            result[i] = intList.get(i);
+        }
+        return result;
+    }
+    
+    public String toString()
+    {
+    	return "h";
     }
 }
