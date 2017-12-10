@@ -223,7 +223,8 @@ public class UnsupervisedNetwork
 				currentInput = input;
 				for(int i = 0; i < input.length; i++)
 				{
-					output += currentInput[i] * centers[i];
+					double temp = Math.abs(currentInput[i] - centers[i]);
+					output += (currentInput[i] * centers[i]) * temp;
 				}
 			}
 			
