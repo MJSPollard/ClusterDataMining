@@ -104,7 +104,7 @@ public class Handler {
 			Kmeans kmeans = new Kmeans(data, 2);
 			break;
 		case 2:
-			DBscan dbscan = new DBscan();
+			DBscan dbscan = new DBscan(data);
 			break;
 		case 3:
 			UnsupervisedNetwork un = new UnsupervisedNetwork(data[0].length, 2, .02);
@@ -121,8 +121,8 @@ public class Handler {
 			pos.runPSO(data, 10, 3);
 			break;
 		case 5:
-			ACO aco = new ACO(data);
-			aco.solve();
+//			ACO aco = new ACO(data);
+//			aco.solve();
 			break;
 		default:
 			System.out.println("Input Error, try again");
@@ -141,24 +141,26 @@ public class Handler {
 	public void DatasetMenu() throws IOException {
 		int choice = 0;
 		String dataSet = "";
-		System.out.println("Enter the number of a Dataset\n" + "1. papers2013\n" + "2. papers2014\n"
-				+ "3. gesturephase\n" + "4. htru_2\n" + "5. electric\n");
+		System.out.println("Enter the number of a Dataset\n" + "1. iris\n" + "2. wine_small\n"
+				+ "3. wine_big\n" + "4. htru_2\n" + "5. student_eval\n");
 		choice = Integer.parseInt(scan.nextLine());
+		
+		//dataset sizes are hard coded in for efficiency
 		switch (choice) {
 		case 1:
-			handler.getDataSet("Project4_447/src/resources/papers2013.csv", 17898, 9);
+			handler.getDataSet("Project4_447/src/resources/iris.csv", 150, 4);
 			break;
 		case 2:
-			handler.getDataSet("Project4_447/src/resources/papers2014.csv", 17898, 9);
+			handler.getDataSet("Project4_447/src/resources/wine_small.csv", 178, 14);
 			break;
 		case 3:
-			handler.getDataSet("src/resources/wine_big.csv", 4898, 12);
+			handler.getDataSet("Project4_447/src/resources/wine_big.csv", 4898, 12);
 			break;
 		case 4:
-			handler.getDataSet("src/resources/htru_2.csv", 17898, 9);
+			handler.getDataSet("Project4_447/src/resources/htru_2.csv", 17898, 9);
 			break;
 		case 5:
-			handler.getDataSet("Project4_447/src/resources/electric.csv", 17898, 9);
+			handler.getDataSet("Project4_447/src/resources/student_eval.csv", 5820, 33);
 			break;
 		default:
 			System.out.println("Input Error, try again");
@@ -174,7 +176,6 @@ public class Handler {
 		double[][] tempData = transpose(handler.data);
 		
 		count = 0;
-
         for (double[] instance : tempData)
         {
             double[] instanceData = new double[instance.length];
@@ -186,7 +187,6 @@ public class Handler {
             tempData[count] = handler.normalize(instanceData);
             count++;
         }
-
         data = transpose(tempData);
 	}
 	

@@ -106,7 +106,7 @@ public class Kmeans {
 	 * @param clusterCenters
 	 * @return
 	 */
-	public double calculateDistance(double[][] data, int clusterNum, double[][] clusterCenters) {
+	public void calculateDistance(double[][] data, int clusterNum, double[][] clusterCenters) {
 		int finalDistance = 0;
 		double dataSum = 0;
 		double dataAvg = 0;
@@ -144,8 +144,6 @@ public class Kmeans {
 		// System.out.println(dataList.get(i));
 		// }
 		// System.out.println("data size = " + dataList.size());
-
-		return finalDistance;
 	}
 
 	/**
