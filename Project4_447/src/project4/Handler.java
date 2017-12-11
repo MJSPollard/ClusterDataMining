@@ -131,7 +131,6 @@ public class Handler {
 				un.train(data[i]);
 				un.evaluateOutput();
 			}
-			un.allWins();
 			break;
 		case 4:
 			PSO pos = new PSO();

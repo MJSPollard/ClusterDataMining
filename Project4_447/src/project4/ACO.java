@@ -167,14 +167,14 @@ public class ACO
 		setupPM();
 		
 		best = new Ant(1,1,1);
-		best.setFitness(maxIterations);
+		best.setFitness(100000000);
 
 		int iter = 0;
 		// run for maxIterations
 		// preserve best tour
 		while (iter < maxIterations)
 		{
-			//resetAnts();
+			resetAnts();
 
 			for (Ant ant : ants)
 			{
@@ -196,14 +196,13 @@ public class ACO
 				
 				updatePheromones();
 				
-				System.out.println("FIT: " + ant.getFitness());
 				if(ant.getFitness() < best.getFitness())
 				{
 					best = new Ant(ant);
 				}
 			}
 			iter++;
-			System.out.println("Best Fitness: " + best.getFitness());
+			System.out.println("Iteration Best Fitness: " + best.getFitness());
 		}
 		
 		System.out.println("Final Fitness: " + best.getFitness());
