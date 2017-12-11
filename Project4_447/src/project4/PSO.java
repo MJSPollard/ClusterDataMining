@@ -3,8 +3,15 @@ import project4.Particle.XYClass;
 import project4.Particle.speedClass;
 import java.util.*;
 
+/**
+ * 
+ * public class PSO, runs the PSO clustering algorithms on the selected data set
+ * 
+ */
 public class PSO
 {
+	//many parameters for this class, having large functions that need to be updated
+	//parameters include swarm boundaries and best values 
 	ArrayList<Particle> swarm = new ArrayList<Particle>();
 	static double data[][];
 	static int clusterNum;
@@ -24,7 +31,7 @@ public class PSO
 	double vMin = 0;
 	int numPart = 10;
 	int numD = 2;
-	int numT = 100;
+	int numT = 20;
 	double gBestValue = -10000;
 	double[] pBestValue = new double[numPart];
     double[] gBestPosition = new double[numD];
@@ -50,7 +57,7 @@ public class PSO
 		Particle part = new Particle();
 		
 		double X = rand.nextDouble() * 5.0 + 1.0;
-		 double Y = rand.nextDouble() * 3.0 - 1.0;
+		 double Y = rand.nextDouble() * 3.0 - 1.0;			//potential implementation of swarm optimization of algorithms
 		 XYClass loc = part.new XYClass(X, Y);
 		 part.setLocation(loc);
 		 
@@ -64,15 +71,21 @@ public class PSO
 	
 	
 
-	
+	/**
+	 * PSO method called in handler
+	 * @param data
+	 * @param swarmNum
+	 * @param clusterNum
+	 */
 	public void runPSO(double data[][], int swarmNum, int clusterNum) {
+		//pulls parameters into class
 		Random rand = new Random();
 		this.data = data;
 		this.clusterNum = clusterNum;
 		this.swarmNum = swarmNum;
-		//generatePSO();
 		int i = 0;
 
+		//error handling functions
 		if (data.length == 0) {
 			System.out.println("The dataset is empty");
 			System.exit(0);
@@ -92,43 +105,48 @@ public class PSO
 		double bestLoc[] = new double[10];
 		ArrayList<XYClass> bestXY = new ArrayList<XYClass>();
 		
+		//main loop of iteration
+		for(int m = 0; m<numT; m++) {
+		
 		for(int j=0; j<numPart; j++){
-	         pBestValue[j] = 1000000; 
+	         pBestValue[j] = -1000000; 
 	     }
 
 	     for(int j=0; j<numPart; j++){  
 	         for(int l=0; l<numD; l++){
-	             R[j][l] = xMin + (xMax-xMin)*rand.nextDouble();
-	             V[j][l] = vMin + (vMax-vMin)*rand.nextDouble();
-	             System.out.println(R[j][l]);
+	             R[j][l] = xMin + (xMax-xMin)*rand.nextDouble();		//starts each particle at random location
+	             V[j][l] = vMin + (vMax-vMin)*rand.nextDouble();		//sets particles velocity
 	         }
 	     }
 		
 	     for(int j=0; j<numPart; j++){
-	            M[j] = fitness(R[j]);
+	            M[j] = fitness(R[j]);			//sets fitness of each particle
+	            M[j] = -M[j];
 	         
 	        }
 
 	     for(int j=0; j<numT; j++){ 
 	            for(int p=0; p<numPart; p++){         
 	                for(int l=0; l<numD; l++){    
-	                    R[p][l] = R[p][l] + V[p][l];
+	                    R[p][l] = R[p][l] + V[p][l];		//sets local best fitness
 
-	                    if(R[p][l] > xMax)          { R[p][l] = xMax;}
-	                    else if(R[p][l] < xMin)     { R[p][l] = xMin;}
+	                    if(R[p][l] > xMax) 
+	                    { R[p][l] = xMax;}
+	                    else if(R[p][l] < xMin)    
+	                    { R[p][l] = xMin;}
 	                }           
 	            }   
 
 	            for(int p=0; p<numPart; p++){ 
 
-	                M[p] = fitness(R[p]);
-	              
+	                M[p] = fitness(R[p]);		
+	          
 	            
 	                if(M[p] > pBestValue[p]){
 	                
 	                     pBestValue[p] = M[p];
 	                     for(int l=0; l<numD; l++){
-	                        pBestPosition[p][l] = R[p][l];
+	                        pBestPosition[p][l] = R[p][l];		//finds local best location
 	                     }
 	                 }
 	                
@@ -136,16 +154,17 @@ public class PSO
 	                    
 	                    gBestValue = M[p];          
 	                    for(int l=0; l<numD; l++){
-	                       gBestPosition[l] =  R[p][l];
+	                       gBestPosition[l] =  R[p][l];		//updates best location
 	                    }
 	                }
 	            
 	            }
-	            bestFitnessHistory[j] = gBestValue;
+	            bestFitnessHistory[j] = gBestValue;			//stores best fitness history
 	        
 	            w = yMax - ((yMax-yMin)/numT) * j;
 	           
 	            for(int p=0; p<numPart; p++){
+	            		//updates global best fitness
 	                for(int l=0; l<numD; l++){
 	                    
 	                    r1 = rand.nextDouble();
@@ -161,8 +180,10 @@ public class PSO
 	                }
 	            }
 	            //output global best value at current timestep
-	            System.out.println("iteration: " + j + " BestValue " + gBestValue);
-	        }   
+	            
+	        }  
+	      System.out.println("iteration: " + m + " BestValue " + gBestValue);
+		}
 
 
 
@@ -182,6 +203,7 @@ public class PSO
 		System.out.println("PSO performed in " + (endTime - startTime) + " ms");
 	}
 	
+	//fitness function calls functions imported from K-means class to find distances within the data
 	public double fitness(double[] in){
         double retValue = 0;
 
@@ -193,7 +215,12 @@ public class PSO
 	
 	 
 
-	
+	/**
+	 * Imported methods from the K-means class (documented there) below
+	 * @param data
+	 * @param clusterNum
+	 * @return
+	 */
 	public double[][] initializeCenters(double[][] data, int clusterNum) {
 
 		Random rand = new Random();
