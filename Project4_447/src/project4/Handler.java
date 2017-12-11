@@ -24,12 +24,17 @@ public class Handler {
 
 		// checks the working directory
 		System.out.println("Working Directory = " + System.getProperty("user.dir"));
+		
+		handler.mainLoop();
+	}
+
+	public void mainLoop() throws IOException
+	{
 		handler.DatasetMenu();
 		handler.normalizeData();
 		System.out.println("Data has been normalized");
-	//	handler.printArray();
 		handler.AlgorithmMenu();
-		System.exit(0);
+		mainLoop();
 	}
 
 	/**
@@ -139,8 +144,7 @@ public class Handler {
 			break;
 		}
 		long endTime = System.currentTimeMillis();
-		System.out.println("Algorithm time to perform: " + (endTime - startTime) + " ms");
-
+		System.out.println("Algorithm time to perform: " + (endTime - startTime) + " ms\n\n");
 	}
 
 	/**
@@ -153,7 +157,7 @@ public class Handler {
 		int choice = 0;
 		String dataSet = "";
 		System.out.println("Enter the number of a Dataset\n" + "1. iris\n" + "2. wine_small\n"
-				+ "3. wine_big\n" + "4. htru_2\n" + "5. student_eval\n");
+				+ "3. wine_big\n" + "4. htru_2\n" + "5. student_eval\n" + "6. Exit\n");
 		choice = Integer.parseInt(scan.nextLine());
 		
 		//dataset sizes are hard coded in for efficiency
@@ -175,6 +179,8 @@ public class Handler {
 		case 5:
 			handler.getDataSet("Project4_447/src/resources/student_eval.csv", 5820, 33);
 			break;
+		case 6:
+			System.exit(0);
 		default:
 			System.out.println("Input Error, try again");
 			DatasetMenu();
