@@ -58,7 +58,6 @@ public class UnsupervisedNetwork
 	         */
 		public UnsupervisedNetwork(int inputSize, int hiddenSize, double l_rate)
 		{
-			random = new Random(420);
 			//network = new ArrayList<Neuron[]>();
 			//Initialize properties of UnsupervisedNetwork
 			this.l_rate = l_rate;

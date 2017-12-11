@@ -116,7 +116,7 @@ public class Handler {
 			DBscan dbscan = new DBscan(data, radius, minPoints);
 			break;
 		case 3:
-			UnsupervisedNetwork un = new UnsupervisedNetwork(data[0].length, 2, .02);
+			UnsupervisedNetwork un = new UnsupervisedNetwork(data[0].length, 3, .01);
 			un.initLayers(data);
 			for(int i = 0; i < data.length; i++)
 			{
@@ -163,7 +163,7 @@ public class Handler {
 		//dataset sizes are hard coded in for efficiency
 		switch (choice) {
 		case 1:
-			handler.getDataSet("Project4_447/src/resources/iris.csv", 150, 4);
+			handler.getDataSet("src/resources/iris.csv", 150, 4);
 			break;
 		case 2:
 			handler.getDataSet("src/resources/wine_small.csv", 178, 14);
@@ -177,7 +177,7 @@ public class Handler {
 			handler.getDataSet("src/resources/htru_2.csv", 17898, 9);
 			break;
 		case 5:
-			handler.getDataSet("Project4_447/src/resources/student_eval.csv", 5820, 33);
+			handler.getDataSet("src/resources/student_eval.csv", 5820, 33);
 			break;
 		case 6:
 			System.exit(0);
