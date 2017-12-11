@@ -18,28 +18,44 @@ public class Handler {
 	 * Main method for program
 	 * 
 	 * @param args
+	 *            the command line argument
 	 * @throws IOException
+	 *             if file is not found
 	 */
 	public static void main(String[] args) throws IOException {
 
 		// checks the working directory
 		System.out.println("Working Directory = " + System.getProperty("user.dir"));
+		System.out.println(
+				"If data set file cannot be found check working directory above and adjust path in DatasetMenu\n");
+		handler.mainLoop();
+	}
+
+	/**
+	 * main loos that continually runs whole program until exited
+	 * 
+	 * @throws IOException
+	 *             if the file is not found
+	 */
+	private void mainLoop() throws IOException {
 		handler.DatasetMenu();
 		handler.normalizeData();
 		System.out.println("Data has been normalized");
-	//	handler.printArray();
 		handler.AlgorithmMenu();
-		System.exit(0);
+		mainLoop();
 	}
 
 	/**
 	 * Method that reads in the csv to a 2d double type array
 	 * 
 	 * @param dataset
+	 *            the read in dataset
 	 * @param numInstances
+	 *            the number of instances in the dataset
 	 * @param numAttributes
-	 * @return the chosen data set in 2d array format
+	 *            the number of attributes in the dataset
 	 * @throws IOException
+	 *             if file is not found
 	 */
 	public void getDataSet(String dataset, int numInstances, int numAttributes) throws IOException {
 		String[][] stringArray = new String[numInstances][numAttributes];
@@ -68,8 +84,6 @@ public class Handler {
 				data[i][j] = Double.parseDouble(stringArray[i][j]);
 			}
 		}
-
-	//	printArray();
 
 	}
 
@@ -113,8 +127,7 @@ public class Handler {
 		case 3:
 			UnsupervisedNetwork un = new UnsupervisedNetwork(data[0].length, 2, .02);
 			un.initLayers(data);
-			for(int i = 0; i < data.length; i++)
-			{
+			for (int i = 0; i < data.length; i++) {
 				un.train(data[i]);
 				un.evaluateOutput();
 			}
@@ -135,7 +148,7 @@ public class Handler {
 			break;
 		}
 		long endTime = System.currentTimeMillis();
-		System.out.println("Algorithm time to perform: " + (endTime - startTime) + " ms");
+		System.out.println("Algorithm time to perform: " + (endTime - startTime) + " ms\n\n");
 
 	}
 
@@ -148,19 +161,28 @@ public class Handler {
 	public void DatasetMenu() throws IOException {
 		int choice = 0;
 		String dataSet = "";
-		System.out.println("Enter the number of a Dataset\n" + "1. iris\n" + "2. wine_small\n"
-				+ "3. wine_big\n" + "4. htru_2\n" + "5. student_eval\n");
+		// user is presented with various printStatements for dataset choice and exit
+		// function
+		System.out.println("Enter the number of a Dataset\n" + "1. iris\n" + "2. wine_small\n" + "3. wine_big\n"
+				+ "4. htru_2\n" + "5. student_eval\n" + "6. Exit\n");
 		choice = Integer.parseInt(scan.nextLine());
-		
-		//dataset sizes are hard coded in for efficiency
+
+		// dataset sizes are hard coded in for efficiency
+		// radius and minpoint defaulted by dataset
 		switch (choice) {
 		case 1:
+			radius = .1;
+			minPoints = 5;
 			handler.getDataSet("Project4_447/src/resources/iris.csv", 150, 4);
 			break;
 		case 2:
+			radius = .6;
+			minPoints = 12;
 			handler.getDataSet("Project4_447/src/resources/wine_small.csv", 178, 14);
 			break;
 		case 3:
+			radius = .09;
+			minPoints = 80;
 			handler.getDataSet("Project4_447/src/resources/wine_big.csv", 4898, 12);
 			break;
 		case 4:
@@ -169,7 +191,12 @@ public class Handler {
 			handler.getDataSet("Project4_447/src/resources/htru_2.csv", 17898, 9);
 			break;
 		case 5:
+			radius = .1;
+			minPoints = 70;
 			handler.getDataSet("Project4_447/src/resources/student_eval.csv", 5820, 33);
+			break;
+		case 6:
+			System.exit(0); // end loop and exit program
 			break;
 		default:
 			System.out.println("Input Error, try again");
@@ -181,98 +208,90 @@ public class Handler {
 	/**
 	 * Normalizes the data
 	 */
-	public  void normalizeData() {
+	public void normalizeData() {
 		double[][] tempData = transpose(handler.data);
-		
+
 		count = 0;
-        for (double[] instance : tempData)
-        {
-            double[] instanceData = new double[instance.length];
-            
-            for (int i = 0; i < instance.length; i++)
-            {
-                instanceData[i] = instance[i];
-            }
-            tempData[count] = handler.normalize(instanceData);
-            count++;
-        }
-        data = transpose(tempData);
+		for (double[] instance : tempData) {
+			double[] instanceData = new double[instance.length];
+
+			for (int i = 0; i < instance.length; i++) {
+				instanceData[i] = instance[i];
+			}
+			tempData[count] = handler.normalize(instanceData);
+			count++;
+		}
+		data = transpose(tempData);
 	}
-	
-    /**
-     * Used in assistance to normalize data
-     * @param array the array to be transposed
-     * @return the transposed array
-     */
 
-    public double[][] transpose(double[][] array)
-    {
-        if (array == null || array.length == 0)
-        {
-            return array;
-        }
+	/**
+	 * Used in assistance to normalize data
+	 * 
+	 * @param array
+	 *            the array to be transposed
+	 * @return the transposed array
+	 */
 
-        double[][] newArray = new double[array[0].length][array.length];
+	public double[][] transpose(double[][] array) {
+		if (array == null || array.length == 0) {
+			return array;
+		}
 
-        for (int x = 0; x < newArray[0].length; x++)
-        {
-            for (int y = 0; y < newArray.length; y++)
-            {
-                newArray[y][x] = array[x][y];
-            }
-        }
-        return newArray;
-    }
+		double[][] newArray = new double[array[0].length][array.length];
 
-    /**
-     * This method normalizes the data set using Zero-mean, unit variance
-     * Formual: x' = xi - xavg / standard deviation
-     *
-     * @param data the data that is not yet normalized
-     * @return the new normalized data set
-     */
-    public double[] normalize(double[] data)
-    {
-        double sum = 0;
-        double mean = 0;
-        double meanSum = 0;
-        double stdDev = 0;
+		for (int x = 0; x < newArray[0].length; x++) {
+			for (int y = 0; y < newArray.length; y++) {
+				newArray[y][x] = array[x][y];
+			}
+		}
+		return newArray;
+	}
 
-        double[] newData = new double[data.length];
+	/**
+	 * This method normalizes the data set using Zero-mean, unit variance Formual:
+	 * x' = xi - xavg / standard deviation
+	 *
+	 * @param data
+	 *            the data that is not yet normalized
+	 * @return the new normalized data set
+	 */
+	public double[] normalize(double[] data) {
+		double sum = 0;
+		double mean = 0;
+		double meanSum = 0;
+		double stdDev = 0;
 
-        for (int j = 0; j < 4; j++)
-        {
-            if (j == 1)
-            {
-                mean = sum / data.length;
-            }
-            for (int i = 0; i < data.length; i++)
-            {
-            	//Switches based upon section of function to run
-                switch (j)
-                {
-                    case 0:
-                        sum += data[i];
-                        break;
+		double[] newData = new double[data.length];
 
-                    case 1:
-                        meanSum += Math.pow((data[i] - mean), 2);
-                        break;
+		for (int j = 0; j < 4; j++) {
+			if (j == 1) {
+				mean = sum / data.length;
+			}
+			for (int i = 0; i < data.length; i++) {
+				// Switches based upon section of function to run
+				switch (j) {
+				case 0:
+					sum += data[i];
+					break;
 
-                    case 2:
-                        stdDev = Math.sqrt((meanSum / data.length));
-                        break;
+				case 1:
+					meanSum += Math.pow((data[i] - mean), 2);
+					break;
 
-                    case 3:
-                        newData[i] = (data[i] - mean) / stdDev;
-                        break;
+				case 2:
+					stdDev = Math.sqrt((meanSum / data.length));
+					break;
 
-                    default:
-                        break;
-                }
-            }
-        }
-        return newData;
-    }
+				case 3:
+					newData[i] = (data[i] - mean) / stdDev;
+					break;
+
+				default:
+					break;
+				}
+			}
+		}
+		return newData;
+	}
 
 }

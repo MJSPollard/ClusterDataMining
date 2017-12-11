@@ -7,7 +7,7 @@ public class DBscan {
 	// core points = points in a radius
 	// border points = points within theta distance of a core point
 	// noise = points that are not core or border points
-
+	// instance fields
 	double data[][];
 	double radiusDistance; // aka: theta
 	int minPoints; // the mimimum amount of core point for a radius to be a cluster
@@ -30,6 +30,7 @@ public class DBscan {
 		int coreCount = 0;
 		int borderCount = 0;
 
+		// check parameter errors
 		if (data.length == 0) {
 			System.out.println("The dataset is empty");
 			System.exit(0);
@@ -44,6 +45,7 @@ public class DBscan {
 		System.out.println("theta (radius) = " + radiusDistance);
 		System.out.println("min allowed points per original cluster = " + minPoints);
 
+		// setup and find points
 		normalize(data);
 		findCorePoints();
 		findBorderPoints();
@@ -60,8 +62,8 @@ public class DBscan {
 
 		System.out.println("Original number of core points in Data: " + coreCount);
 		System.out.println("Original number of border Points in Data: " + borderCount);
-
 		System.out.println("Expanded final clusters: ");
+		// finds data in radius and expands clusters
 		addDataAroundCoreToCluster();
 
 	}
@@ -70,10 +72,10 @@ public class DBscan {
 	 * Puts the data in a usable format
 	 * 
 	 * @param data
+	 *            - the read in data set
 	 * @return
 	 */
-	public ArrayList<Double> normalize(double[][] data) {
-		int finalDistance = 0;
+	public void normalize(double[][] data) {
 		double dataSum = 0;
 		double dataAvg = 0;
 
@@ -85,8 +87,6 @@ public class DBscan {
 			dataList.add(dataAvg);
 			dataSum = 0;
 		}
-
-		return dataList;
 	}
 
 	/**
@@ -95,12 +95,13 @@ public class DBscan {
 	 */
 	public void findCorePoints() {
 		int pointCount = 0;
-		int numClusters = 0;
 
+		// loop through data set and test if a point meets centroid requirements
 		for (int i = 0; i < dataList.size(); i++) {
 			pointCount = 0;
 			for (int j = 0; j < dataList.size(); j++) {
 
+				// check if point within radius of other points
 				if ((dataList.get(j) > (dataList.get(i) + radiusDistance))
 						|| (dataList.get(j) < (dataList.get(i) - radiusDistance))) {
 					// do nothing - point not in radius
@@ -108,14 +109,9 @@ public class DBscan {
 					pointCount++;
 				}
 			}
+			// checks to see point in radius are above minimum points required
 			if (pointCount >= minPoints) {
-				labelData[i] = 2; // data at index i is a core point, it has enough points around it;
-				// numClusters++;
-				// System.out.println("pointCount = " + pointCount);
-				// System.out.println("numClusters = " + numClusters);
-				// System.out.println("---------------");
-				// assignCluster(potentialCluster);
-				// potentialCluster.clear(); // reset cluster list
+				labelData[i] = 2; // data at index i is a core point, it has enough points around it, mark it;
 			}
 		}
 
@@ -134,7 +130,7 @@ public class DBscan {
 								|| (dataList.get(i) < (dataList.get(j) - radiusDistance))) {
 							// do nothing, not a border point
 						} else {
-							labelData[i] = 1;
+							labelData[i] = 1; // mark in label index as border
 						}
 					}
 				}
@@ -142,6 +138,12 @@ public class DBscan {
 		}
 	}
 
+	/**
+	 * Expands the current cluster by finding all points around the found core index
+	 * 
+	 * @param coreIndex
+	 *            - the location of the found core in a radius of a cluster
+	 */
 	public void expandCluster(int coreIndex) {
 		for (int j = 0; j < labelData.length; j++) {
 			if ((dataList.get(j) > (dataList.get(coreIndex) + radiusDistance))
@@ -157,10 +159,9 @@ public class DBscan {
 	}
 
 	/**
-	 * 
+	 * calculates and adds points to a cluster
 	 */
 	public void addDataAroundCoreToCluster() {
-		ArrayList<Double> expandedCluster = new ArrayList<Double>();
 		int count = 0;
 
 		for (int i = 0; i < labelData.length; i++) {
@@ -183,9 +184,10 @@ public class DBscan {
 			for (int j = 0; j < dataAroundCore.size(); j++) {
 				for (int k = 0; k < dataList.size(); k++) {
 					if (dataAroundCore.get(j) == dataList.get(k)) {
-						// is this a data point in the current cluster also a core node?
+						// check if this is a data point in the current cluster also a core node
 						if (labelData[k] == 2) {
 							labelData[k] += .001; // mark as visited
+							//expand the cluster
 							expandCluster(k);
 						}
 

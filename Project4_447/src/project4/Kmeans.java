@@ -3,11 +3,12 @@ package project4;
 import java.util.Random;
 import java.util.ArrayList;
 
-//supposed to be really fast
 public class Kmeans {
 
+	// needed instance fields
 	double data[][];
 	int clusterNum;
+	ArrayList<Double>[] clusterList;
 	ArrayList<Double> cluster1 = new ArrayList<Double>();
 	ArrayList<Double> cluster2 = new ArrayList<Double>();
 	ArrayList<Double> cenList = new ArrayList<Double>();
@@ -17,14 +18,21 @@ public class Kmeans {
 	 * Constructor for the K means clustering algorithm
 	 * 
 	 * @param data
+	 *            - the data set from the UCI ML repository
 	 * @param clusterNum
+	 *            - the number of clusters (tunable parameter)
 	 */
 	Kmeans(double data[][], int clusterNum) {
 		this.data = data;
 		this.clusterNum = clusterNum;
 		int maxIterations = 30;
 		int i = 0;
+		clusterList = (ArrayList<Double>[]) new ArrayList[clusterNum];
+		for (i = 0; i < clusterList.length; i++) {
+			clusterList[i] = new ArrayList<Double>();
+		}
 
+		// checks for errors in parameter values
 		if (data.length == 0) {
 			System.out.println("The dataset is empty");
 			System.exit(0);
@@ -34,30 +42,37 @@ public class Kmeans {
 			System.exit(0);
 		}
 
-		// mark the time and alert user
 		System.out.println("K-Means clustering started");
 
-		// initialize random centers and assign the rest of the data to a cluster
-		// according to the distance from centers
-		calculateDistance(data, clusterNum, initializeCenters(data, clusterNum));
+		// initialize random centers and format data into usable form
+		normalize(data, clusterNum, initializeCenters(data, clusterNum));
 
 		// prints size of initial clusters with no centroid updates
+		System.out.println();
 		System.out.println("Iteration number: 1");
-		System.out.println("cluster1 size = " + cluster1.size());
-		System.out.println("cluster2 size = " + cluster2.size());
+		for (int j = 0; j < clusterNum; j++) {
+			System.out.println("cluster " + j + " size " + clusterList[j].size());
+		}
+		i = 0;
 
-		while (i < maxIterations) {		
+		// updates the number of centroids until max iterations have been reached
+		// (tunable)
+		// could be terminated immediately when it converges
+		while (i < maxIterations) {
 			updateCenters();
-			System.out.println("Iteration number: " + (i+2));
-			System.out.println("cluster1 size = " + cluster1.size());
-			System.out.println("cluster2 size = " + cluster2.size());
+			System.out.println("Iteration number: " + (i + 2));
+			// print out cluster sizes
+			for (int j = 0; j < clusterNum; j++) {
+				System.out.println("cluster " + j+ " size: " + clusterList[j].size());
+			}
 			i++;
 		}
 
 	}
 
 	/**
-	 * Initializes the center of the clusters to random points within the data
+	 * Initializes the center of the clusters to random points within the data and
+	 * prints them out
 	 * 
 	 * @param data
 	 *            - The data to be clustered
@@ -95,23 +110,24 @@ public class Kmeans {
 	}
 
 	/**
-	 * calculates the distance of each point to the center of a cluster
+	 * formates data into usable format
 	 * 
 	 * @param data
+	 *            - the input dataset
 	 * @param clusterNum
+	 *            - the amount of cluster
 	 * @param clusterCenters
-	 * @return
+	 *            - the cluster centers
 	 */
-	public void calculateDistance(double[][] data, int clusterNum, double[][] clusterCenters) {
-		int finalDistance = 0;
+	public void normalize(double[][] data, int clusterNum, double[][] clusterCenters) {
 		double dataSum = 0;
 		double dataAvg = 0;
 		double cenSum = 0;
 		double cenAvg = 0;
 
-		// uses averages to compare the distances between the centers and the data
-		// this method was implemented as there didn't seem to be any best option - based
-		// off of no free lunch principle
+		// uses averages to compare the data
+		// this method was implemented as there didn't seem to be any best option -
+		// based off of no free lunch principle
 		for (int instanceIT = 0; instanceIT < clusterCenters.length; instanceIT++) {
 			for (int attrIT = 0; attrIT < clusterCenters[0].length; attrIT++) {
 				cenSum += clusterCenters[instanceIT][attrIT];
@@ -120,7 +136,7 @@ public class Kmeans {
 			cenList.add(cenAvg);
 			cenSum = 0;
 		}
-
+		// delete
 		// for (int i = 0; i < cenList.size(); i++) {
 		// System.out.println(cenList.get(i));
 		// }
@@ -135,7 +151,9 @@ public class Kmeans {
 			dataSum = 0;
 		}
 
+		// calculates which cluster centroid the data point is closest to
 		getClosest(cenList, dataList);
+		// delete
 		// for (int i = 0; i < dataList.size(); i++) {
 		// System.out.println(dataList.get(i));
 		// }
@@ -143,23 +161,32 @@ public class Kmeans {
 	}
 
 	/**
-	 * Calculates which centroid the data is closest too
+	 * Calculates which centroid the datapoint is closest too
+	 * 
+	 * @param cenList
+	 *            - the list of centroids for each cluster
+	 * @param dataList
+	 *            - the list of of data points
 	 */
 	public void getClosest(ArrayList<Double> cenList, ArrayList<Double> dataList) {
 		int dataIndex = 0;
 		int centerIndex = 0;
 
+		// loop through the data
 		for (int i = 0; i < data.length; i++) {
 			double closest = 10000; // set to arbitrarily high number to be overwritten immediately
 			for (int j = 0; j < clusterNum; j++) {
+				// figure out distance of each point to center
 				double num = Math.abs(cenList.get(j) - dataList.get(i));
 
+				// check which centroid is closest
 				if (num < closest) {
 					closest = num;
 					dataIndex = i;
 					centerIndex = j;
 				}
 			}
+			// send information to be added to cluster
 			assignToCluster(cenList.get(centerIndex), dataList.get(dataIndex), centerIndex);
 		}
 
@@ -169,21 +196,25 @@ public class Kmeans {
 	 * assigns the data to a specific cluster
 	 * 
 	 * @param cenValue
+	 *            - the value of the closest center
 	 * @param dataVal
+	 *            - the value of the datapoint
 	 * @param centerIndex
+	 *            - the index of the center
 	 */
 	public void assignToCluster(double cenValue, double dataVal, int centerIndex) {
-		// System.out.println(dataVal);
-		if (centerIndex == 0) {
-			cluster1.add(dataVal);
+
+		// assign to a specific cluster
+		for (int i = 0; i < clusterList.length; i++) {
+			if (i == centerIndex) {
+				clusterList[i].add(dataVal);
+			}
 		}
-		if (centerIndex == 1) {
-			cluster2.add(dataVal);
-		}
+
 	}
 
 	/**
-	 * update center locations in the data
+	 * updates the center locations in the data
 	 */
 	public void updateCenters() {
 		int clusterSum = 0;
@@ -193,38 +224,61 @@ public class Kmeans {
 		cenList.clear();
 
 		// get actual average of cluster
-		for (int i = 0; i < cluster1.size(); i++) {
-			clusterSum += cluster1.get(i);
-		}
-		clusterAvg = clusterSum / cluster1.size();
-		clusterSum = 0;
-
-		// find actual average data point in cluster
-		double closest = 1000;
-		for (int i = 0; i < cluster1.size(); i++) {
-			double num = Math.abs(clusterAvg - cluster1.get(i));
-			if (num < closest) {
-				closest = num;
-				newCenterIndex = i;
+		for (int j = 0; j < clusterList.length; j++) {
+			for (int i = 0; i < clusterList[j].size(); i++) {
+				clusterSum += clusterList[j].get(i);
 			}
-		}
-		cenList.add(cluster1.get(newCenterIndex)); // add new center to the list of centers
-		cluster1.clear(); // reset clusters to be overwritten
+			clusterAvg = clusterSum / clusterList[j].size();
+			clusterSum = 0;
 
-		closest = 10000;
-		for (int i = 0; i < cluster2.size(); i++) {
-			double num = Math.abs(clusterAvg - cluster2.get(i));
-			if (num < closest) {
-				closest = num;
-				newCenterIndex = i;
+			// find actual average data point in cluster
+			double closest = 1000;
+			for (int i = 0; i < clusterList[j].size(); i++) {
+				double num = Math.abs(clusterAvg - clusterList[j].get(i));
+				if (num < closest) {
+					closest = num;
+					newCenterIndex = i;
+				}
 			}
+			cenList.add(clusterList[j].get(newCenterIndex)); // add new center to the list of centers
+			clusterList[j].clear(); // reset clusters to be overwritten
 		}
-		cenList.add(cluster2.get(newCenterIndex)); // add new center to the list of centers
-		cluster2.clear(); // reset clusters to be overwritten
-		
+
+		// // find actual average data point in cluster
+		// double closest = 1000;
+		// for (int i = 0; i < cluster1.size(); i++) {
+		// double num = Math.abs(clusterAvg - cluster1.get(i));
+		// if (num < closest) {
+		// closest = num;
+		// newCenterIndex = i;
+		// }
+		// }
+		// cenList.add(cluster1.get(newCenterIndex)); // add new center to the list of
+		// centers
+		// cluster1.clear(); // reset clusters to be overwritten
+
+		// // get actual average of cluster
+		// for (int i = 0; i < cluster2.size(); i++) {
+		// clusterSum += cluster2.get(i);
+		// }
+		// clusterAvg = clusterSum / cluster2.size();
+		// clusterSum = 0;
+		//
+		// // find actual average data point in cluster
+		// closest = 10000;
+		// for (int i = 0; i < cluster2.size(); i++) {
+		// double num = Math.abs(clusterAvg - cluster2.get(i));
+		// if (num < closest) {
+		// closest = num;
+		// newCenterIndex = i;
+		// }
+		// }
+		// cenList.add(cluster2.get(newCenterIndex)); // add new center to the list of
+		// centers
+		// cluster2.clear(); // reset clusters to be overwritten
+
 		getClosest(cenList, dataList);
-		
-		
+
 	}
 
 }
