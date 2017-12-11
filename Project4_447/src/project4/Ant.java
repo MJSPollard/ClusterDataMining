@@ -120,6 +120,7 @@ public class Ant
         }
         
         activation = new boolean[activation.length][activation[0].length];
+        attrCenters = new double[attrCenters.length][attrCenters[0].length];
     }
     
     /**

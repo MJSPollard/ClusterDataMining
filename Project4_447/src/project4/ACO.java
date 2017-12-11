@@ -14,7 +14,7 @@ public class ACO
 	private Random random;
 	private Ant best;
 	private final double alpha = 1;
-	private final double beta = 1;
+	private final double beta = 2;
 
 	public ACO(double[][] data, int clusters)
 	{
@@ -41,7 +41,7 @@ public class ACO
 
 	}
 
-	private void setupAnts()
+	private void resetAnts()
 	{
 		for (int i = 0; i < TotalAnts; i++)
 		{
@@ -75,16 +75,14 @@ public class ACO
 
 			for(int cluster = 0; cluster < clusters.length; cluster++)
 			{
-				//System.out.println("PM: " +pheromoneMatrix[index][cluster]);
 				double pheromoneFactor = Math.pow(pheromoneMatrix[index][cluster], alpha);
 
 				double distanceFactor = calculateDistance(dataPoint, clusters[i]);
-				//System.out.println("DF: " + distanceFactor);
+
 				distanceFactor = Math.pow((1 / distanceFactor), beta);
 
 				divider += pheromoneFactor * distanceFactor;
 			}
-			//System.out.println(divider);
 
 			double distance = calculateDistance(dataPoint, clusters[i]);
 			distance = Math.pow((1 / distance), beta);
@@ -92,9 +90,8 @@ public class ACO
 			double pheromone = Math.pow(pheromoneMatrix[index][i], alpha);
 
 			double total = pheromone * distance;
-
+			
 			double clusterProb = total / divider;
-			//System.out.println("CP: " + clusterProb);
 
 			if (clusterProb > highest)
 			{
@@ -131,13 +128,14 @@ public class ACO
 			{
                 if(activation[i][j])
                 {
+                	double totalDistance = 0;
                     for(int k = 0; k < data[i].length; k++)
                     {
                     	//System.out.println(center[j][k]);
-                    	fitness += Math.abs(data[i][k] - center[j][k]);
+                    	totalDistance += Math.abs(data[i][k] - center[j][k]);
                     }
                     //System.out.println("fit: " + fitness + " || " + data[i].length);
-                    //fitness = fitness / data[i].length;
+                    fitness += totalDistance / data[i].length;
                     //System.out.println(fitness);
                     break;
                 }
@@ -176,7 +174,7 @@ public class ACO
 		// preserve best tour
 		while (iter < maxIterations)
 		{
-			//setupAnts();
+			//resetAnts();
 
 			for (Ant ant : ants)
 			{
