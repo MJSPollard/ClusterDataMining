@@ -125,8 +125,9 @@ public class Handler {
 			pos.runPSO(data, 10, 3);
 			break;
 		case 5:
-//			ACO aco = new ACO(data);
-//			aco.solve();
+			ACO aco = new ACO(data, 3);
+			aco.initialize();
+			aco.run();
 			break;
 		default:
 			System.out.println("Input Error, try again");
