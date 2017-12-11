@@ -84,9 +84,9 @@ public class ACO
 	/**
 	 * calculates the next datapoint's cluster by determining the probability
 	 * by distance and pheromone factors to Cluster.
-	 * @param ant
-	 * @param index
-	 * @return
+	 * @param ant Ant ant to be moved
+	 * @param index int instance of the data
+	 * @return int cluster index of the winner
 	 */
 	private int moveAnt(Ant ant, int index)
 	{
@@ -101,6 +101,7 @@ public class ACO
 		{
 			double divider = 0.0;
 
+			//calculates the denominator of the probability
 			for(int cluster = 0; cluster < clusters.length; cluster++)
 			{
 				double pheromoneFactor = Math.pow(pheromoneMatrix[index][cluster], alpha);
@@ -111,7 +112,8 @@ public class ACO
 
 				divider += pheromoneFactor * distanceFactor;
 			}
-
+			
+			//begins calculating the numerator of the probability
 			double distance = calculateDistance(dataPoint, clusters[i]);
 			distance = Math.pow((1 / distance), beta);
 
@@ -121,6 +123,7 @@ public class ACO
 			
 			double clusterProb = total / divider;
 
+			//if the probability is greater than the highest, replace highest
 			if (clusterProb > highest)
 			{
 				highest = clusterProb;
@@ -130,39 +133,59 @@ public class ACO
 		return winnerIndex;
 	}
 
+	/**
+	 * Calculates the mean distance between a datapoint and the center of a cluster
+	 * @param dp double[] datapoint
+	 * @param cluster double[] cluster center values
+	 * @return double the distance
+	 */
 	private double calculateDistance(double[] dp, double[] cluster)
 	{
 		double dist = 0;
 
+		//For every value in both, sum their absolute difference
 		for (int i = 0; i < dp.length; i++)
 		{
 			dist += Math.abs(dp[i] - cluster[i]);
 		}
-
+		
+		//divide the difference sum by the number of attributes
 		dist = dist / dp.length;
 
 		return dist;
 	}
 
+	/**
+	 * Calculates the fitness of an ant by calculating their overall
+	 * mean distance of their center to each datapoint
+	 * @param ant Ant current ant's fitness to be calculated
+	 * @param data double[][] data read from file
+	 */
 	public void calculateFitness(Ant ant, double[][] data)
 	{
 		double fitness = 0;
 		boolean[][] activation = ant.getActivation();
 		double[][] center = ant.getAttrCenters();
 		
+		//for every datapoint
 		for(int i = 0; i < size; i++)
 		{
-			for(int j = 0; j < pheromoneMatrix[0].length; j++)
+			//for every cluster
+			for(int j = 0; j < pheromoneMatrix[i].length; j++)
 			{
+				//if that datapoint i belongs to cluster j
                 if(activation[i][j])
                 {
                 	double totalDistance = 0;
+                	
+                	//for each attribute, sum the distance from the datapoint to the center
                     for(int k = 0; k < data[i].length; k++)
                     {
                     	totalDistance += Math.abs(data[i][k] - center[j][k]);
                     }
+                    
+                    //divide distance by total items to get mean distance
                     fitness += totalDistance / data[i].length;
-                    break;
                 }
 			}
 		}
@@ -170,6 +193,10 @@ public class ACO
 		ant.setFitness(fitness);
 	}
 	
+	/**
+	 * updates pheromoneMatrix by each ant, determined by a general contribution factor
+	 * and based on the strength of their fitness function
+	 */
 	public void updatePheromones()
 	{
 		for(int i = 0; i < pheromoneMatrix.length; i++)
@@ -187,6 +214,9 @@ public class ACO
 		}
 	}
 
+	/**
+	 * runs the ACO clustering algorithm
+	 */
 	public void run()
 	{
 		setupPM();
@@ -195,8 +225,8 @@ public class ACO
 		best.setFitness(100000000);
 
 		int iter = 0;
-		// run for maxIterations
-		// preserve best tour
+		
+		//loops for maxIterations
 		while (iter < maxIterations)
 		{
 			resetAnts();
@@ -206,21 +236,27 @@ public class ACO
 				ArrayList<Integer> randomDataCounter = getRandomCounter();
 
 				int k = 0;
+				//until ant has travelled to every datapoint
 				while(ant.finish())
 				{
 					int dataIndex = randomDataCounter.get(k);
 					
+					//adds winning cluster index with dataIndex
 					ant.addWinner(dataIndex, moveAnt(ant, dataIndex));
 
+					//updates center based on newest datapoint
 					ant.updateCenter(data);
 
 					k++;
 				}
 
+				//calculates the fitness of an ant's cluster and the entire data
 				calculateFitness(ant, data);
 				
+				//updates pheromoneMatrix
 				updatePheromones();
 				
+				//if better than the best, replace the best
 				if(ant.getFitness() < best.getFitness())
 				{
 					best = new Ant(ant);
@@ -233,6 +269,10 @@ public class ACO
 		System.out.println("Final Fitness: " + best.getFitness());
 	}
 
+	/**
+	 * returns shuffled arraylist of the indexes of the data
+	 * @return ArrayList<Integer>
+	 */
 	public ArrayList<Integer> getRandomCounter()
 	{
 		ArrayList<Integer> dataIndex = new ArrayList<>();
