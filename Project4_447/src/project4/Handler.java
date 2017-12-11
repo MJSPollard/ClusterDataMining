@@ -118,6 +118,7 @@ public class Handler {
 			break;
 		case 4:
 			PSO pos = new PSO();
+			pos.runPSO(data, 10, 3);
 			break;
 		case 5:
 			ACO aco = new ACO(data);
@@ -154,7 +155,7 @@ public class Handler {
 			handler.getDataSet("src/resources/wine_big.csv", 4898, 12);
 			break;
 		case 4:
-			handler.getDataSet("Project4_447/src/resources/htru_2.csv", 17898, 9);
+			handler.getDataSet("src/resources/htru_2.csv", 17898, 9);
 			break;
 		case 5:
 			handler.getDataSet("Project4_447/src/resources/electric.csv", 17898, 9);
