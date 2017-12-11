@@ -23,7 +23,6 @@ public class Kmeans {
 		this.data = data;
 		this.clusterNum = clusterNum;
 		int maxIterations = 30;
-
 		int i = 0;
 
 		if (data.length == 0) {
@@ -115,7 +114,7 @@ public class Kmeans {
 		double cenAvg = 0;
 
 		// uses averages to compare the distances between the centers and the data
-		// this method was implemented as there didn't seem to be a best option - based
+		// this method was implemented as there didn't seem to be any best option - based
 		// off of no free lunch principle
 		for (int instanceIT = 0; instanceIT < clusterCenters.length; instanceIT++) {
 			for (int attrIT = 0; attrIT < clusterCenters[0].length; attrIT++) {
