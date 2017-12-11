@@ -17,6 +17,7 @@ public class PSO
 	static int clusterNum;
 	int swarmNum;
 	int closI = 0;
+	int in;
 	double closest;
 	double w = 0.729844;
 	double c1, c2 = 1.49618;
@@ -29,7 +30,7 @@ public class PSO
 	double yMin = 0;
 	double vMax = 1;
 	double vMin = 0;
-	int numPart = 10;
+	int numPart = 50;
 	int numD = 2;
 	int numT = 20;
 	double gBestValue = -10000;
@@ -52,7 +53,7 @@ public class PSO
 		
 	Random rand = new Random();
 	int swarmNum = 10;
-	
+	 
 	for(int i = 0; i < swarmNum; i++) {
 		Particle part = new Particle();
 		
@@ -83,6 +84,7 @@ public class PSO
 		this.data = data;
 		this.clusterNum = clusterNum;
 		this.swarmNum = swarmNum;
+		this.in = in;
 		int i = 0;
 
 		//error handling functions
@@ -106,7 +108,6 @@ public class PSO
 		ArrayList<XYClass> bestXY = new ArrayList<XYClass>();
 		
 		//main loop of iteration
-		for(int m = 0; m<numT; m++) {
 		
 		for(int j=0; j<numPart; j++){
 	         pBestValue[j] = -1000000; 
@@ -125,7 +126,7 @@ public class PSO
 	         
 	        }
 
-	     for(int j=0; j<numT; j++){ 
+	     for(int j= 0; j<numT; j++){ 
 	            for(int p=0; p<numPart; p++){         
 	                for(int l=0; l<numD; l++){    
 	                    R[p][l] = R[p][l] + V[p][l];		//sets local best fitness
@@ -180,10 +181,10 @@ public class PSO
 	                }
 	            }
 	            //output global best value at current timestep
-	            
+	            System.out.println("iteration: " + j + " BestValue " + gBestValue);
 	        }  
-	      System.out.println("iteration: " + m + " BestValue " + gBestValue);
-		}
+	   
+		
 
 
 
