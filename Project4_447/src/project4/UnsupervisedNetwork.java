@@ -119,7 +119,7 @@ public class UnsupervisedNetwork
 			String line = "";
 			Neuron winner = outputNeuron.getWinner();
 			line += "Cluster " +outputNeuron.getWinnerIndex() + " Fitness: ";
-			line += (1 / Math.abs(winner.getOutput()));
+			line += Math.abs(winner.getOutput());
 			return line;
 		}
 		
@@ -153,9 +153,11 @@ public class UnsupervisedNetwork
 				currentInput = input;
 				for(int i = 0; i < input.length; i++)
 				{
-					double temp = Math.abs(currentInput[i] - centers[i]);
-					output += (currentInput[i] * centers[i]) * temp;
+					double temp = Math.pow((currentInput[i] - centers[i]), 2);
+					output +=  temp;
 				}
+				
+				output = 1 / Math.sqrt(output);
 			}
 			
 			public double getOutput()

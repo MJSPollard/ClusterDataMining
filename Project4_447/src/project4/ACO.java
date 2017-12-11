@@ -167,7 +167,7 @@ public class ACO
 		setupPM();
 		
 		best = new Ant(1,1,1);
-		best.setFitness(maxIterations);
+		best.setFitness(100000000);
 
 		int iter = 0;
 		// run for maxIterations
