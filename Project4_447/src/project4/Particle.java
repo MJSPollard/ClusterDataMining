@@ -41,11 +41,11 @@ public class Particle
 		return speed;
 	}
 	
-	private class XYClass
+	public class XYClass
 	{
 		private double X, Y;
 		
-		private XYClass(double x, double y)
+		public XYClass(double x, double y)
 		{
 			X = x;
 			Y = y;
@@ -74,12 +74,12 @@ public class Particle
 		}
 	}
 	
-	private class speedClass
+	public class speedClass
 	{
 		private double SX;
 		private double SY;
 		
-		private speedClass(double sx, double sy) 
+		public speedClass(double sx, double sy) 
 		{
 			SX = sx;
 			SY = sy;
