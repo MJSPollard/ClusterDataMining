@@ -1,8 +1,15 @@
 package project4;
 
+/**
+ * ACO class uses Ant objects to cluster data based on pheromone
+ * influences and distance between their centers and the data.
+ * Then it will compute a fitness based on their center values, and save a best.
+ * 
+ * @authors Hugh Jackovich, Mike Pollard, Cory Petersen
+ */
+
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Random;
 import java.lang.Math;
 
 public class ACO
@@ -11,36 +18,47 @@ public class ACO
 	private final int TotalAnts;
 	private Ant[] ants;
 	private int size, maxIterations;
-	private Random random;
 	private Ant best;
 	private final double alpha = 1;
 	private final double beta = 2;
 
+	/**
+	 * Constructs an ACO object, that reads in data, clusters
+	 * and initializes variables to be used by the optimization
+	 * @param data double[][] data read from file
+	 * @param clusters int number of clusters
+	 */
 	public ACO(double[][] data, int clusters)
 	{
-		random = new Random(420);
 		this.data = data;
-		size = data.length / 2;
+		size = data.length;
 		
+		//a pheromone towards clusters, given datapoint
 		pheromoneMatrix = new double[size][clusters];
 
 
-		//TotalAnts = (int) (size * .5);
+		//TotalAnts = (int) (size * .75);
 		TotalAnts = 20;
 
 		maxIterations = 10;
 	}
 
+	/**
+	 * Initializes Ant objects
+	 */
 	public void initialize()
 	{
 		ants = new Ant[TotalAnts];
 		for (int i = 0; i < TotalAnts; i++)
 		{
-			ants[i] = new Ant(data.length/2, data[0].length, pheromoneMatrix[0].length);
+			ants[i] = new Ant(data.length, data[0].length, pheromoneMatrix[0].length);
 		}
 
 	}
 
+	/**
+	 * Calls the clear method on each ant
+	 */
 	private void resetAnts()
 	{
 		for (int i = 0; i < TotalAnts; i++)
@@ -49,6 +67,9 @@ public class ACO
 		}
 	}
 
+	/**
+	 * Initializes pheromoneMatrix with random values
+	 */
 	private void setupPM()
 	{
 		for (int i = 0; i < pheromoneMatrix.length; i++)
@@ -60,6 +81,13 @@ public class ACO
 		}
 	}
 
+	/**
+	 * calculates the next datapoint's cluster by determining the probability
+	 * by distance and pheromone factors to Cluster.
+	 * @param ant
+	 * @param index
+	 * @return
+	 */
 	private int moveAnt(Ant ant, int index)
 	{
 		double[] dataPoint = data[index];
@@ -131,12 +159,9 @@ public class ACO
                 	double totalDistance = 0;
                     for(int k = 0; k < data[i].length; k++)
                     {
-                    	//System.out.println(center[j][k]);
                     	totalDistance += Math.abs(data[i][k] - center[j][k]);
                     }
-                    //System.out.println("fit: " + fitness + " || " + data[i].length);
                     fitness += totalDistance / data[i].length;
-                    //System.out.println(fitness);
                     break;
                 }
 			}

@@ -32,7 +32,7 @@ public class Handler {
 	}
 
 	/**
-	 * main loos that continually runs whole program until exited
+	 * main loop that continually runs whole program until exited
 	 * 
 	 * @throws IOException
 	 *             if the file is not found
@@ -130,11 +130,16 @@ public class Handler {
 			for (int i = 0; i < data.length; i++) {
 				un.train(data[i]);
 				un.evaluateOutput();
+				if(i % 1000 == 0)
+				{
+					System.out.println(un.getFitness());
+				}
 			}
+			un.showClusters();
 			break;
 		case 4:
 			PSO pos = new PSO();
-			pos.runPSO(data, 10, 3);
+			pos.runPSO(data, 100, 3);
 			break;
 		case 5:
 			ACO aco = new ACO(data, 3);

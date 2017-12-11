@@ -31,11 +31,10 @@ public class PSO
 	double vMin = 0;
 	int numPart = 50;
 	int numD = 2;
-	int numT = 20;
+	int numT = 250;
 	double gBestValue = -10000;
 	double[] pBestValue = new double[numPart];
 	double[] gBestPosition = new double[numD];
-	double[] bestFitnessHistory = new double[numT];
 	double[] M = new double[numPart];
 
 	double[][] pBestPosition = new double[numPart][numD];
@@ -153,7 +152,6 @@ public class PSO
 				}
 
 			}
-			bestFitnessHistory[j] = gBestValue; // stores best fitness history
 
 			w = yMax - ((yMax - yMin) / numT) * j;
 
