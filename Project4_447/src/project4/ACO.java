@@ -13,20 +13,22 @@ public class ACO
 	private int size, maxIterations;
 	private Random random;
 	private Ant best;
-	private final double alpha = .1;
-	private final double beta = .5;
+	private final double alpha = 1;
+	private final double beta = 1;
 
-	public ACO(double[][] data, int instances, int attr, int clusters)
+	public ACO(double[][] data, int clusters)
 	{
 		random = new Random(420);
 		this.data = data;
-		pheromoneMatrix = new double[instances][clusters];
+		size = data.length / 2;
+		
+		pheromoneMatrix = new double[size][clusters];
 
-		size = data.length;
+
 		//TotalAnts = (int) (size * .5);
-		TotalAnts = 200;
+		TotalAnts = 20;
 
-		maxIterations = 500;
+		maxIterations = 10;
 	}
 
 	public void initialize()
@@ -34,7 +36,7 @@ public class ACO
 		ants = new Ant[TotalAnts];
 		for (int i = 0; i < TotalAnts; i++)
 		{
-			ants[i] = new Ant(data.length, data[0].length, pheromoneMatrix[0].length);
+			ants[i] = new Ant(data.length/2, data[0].length, pheromoneMatrix[0].length);
 		}
 
 	}
@@ -70,18 +72,19 @@ public class ACO
 		for (int i = 0; i < clusters.length; i++)
 		{
 			double divider = 0.0;
-			int cc = 0;
 
-			for (double[] cluster : clusters)
+			for(int cluster = 0; cluster < clusters.length; cluster++)
 			{
-				double pheromoneFactor = Math.pow(pheromoneMatrix[index][cc], alpha);
+				//System.out.println("PM: " +pheromoneMatrix[index][cluster]);
+				double pheromoneFactor = Math.pow(pheromoneMatrix[index][cluster], alpha);
 
 				double distanceFactor = calculateDistance(dataPoint, clusters[i]);
+				//System.out.println("DF: " + distanceFactor);
 				distanceFactor = Math.pow((1 / distanceFactor), beta);
 
 				divider += pheromoneFactor * distanceFactor;
-				cc++;
 			}
+			//System.out.println(divider);
 
 			double distance = calculateDistance(dataPoint, clusters[i]);
 			distance = Math.pow((1 / distance), beta);
@@ -91,6 +94,7 @@ public class ACO
 			double total = pheromone * distance;
 
 			double clusterProb = total / divider;
+			//System.out.println("CP: " + clusterProb);
 
 			if (clusterProb > highest)
 			{
@@ -121,7 +125,7 @@ public class ACO
 		boolean[][] activation = ant.getActivation();
 		double[][] center = ant.getAttrCenters();
 		
-		for(int i = 0; i < data.length; i++)
+		for(int i = 0; i < size; i++)
 		{
 			for(int j = 0; j < pheromoneMatrix[0].length; j++)
 			{
@@ -129,10 +133,12 @@ public class ACO
                 {
                     for(int k = 0; k < data[i].length; k++)
                     {
+                    	//System.out.println(center[j][k]);
                     	fitness += Math.abs(data[i][k] - center[j][k]);
                     }
-                    
-                    fitness = fitness / data[i].length;
+                    //System.out.println("fit: " + fitness + " || " + data[i].length);
+                    //fitness = fitness / data[i].length;
+                    //System.out.println(fitness);
                     break;
                 }
 			}
@@ -150,7 +156,7 @@ public class ACO
 				pheromoneMatrix[i][j] *= .5;
 				for(Ant ant : ants)
 				{
-					double contributionFactor = ants.length / 500;
+					double contributionFactor = ants.length / 100;
 					pheromoneMatrix[i][j] += ant.getFitness() * contributionFactor;
 				}
 			}
@@ -170,17 +176,17 @@ public class ACO
 		// preserve best tour
 		while (iter < maxIterations)
 		{
-			setupAnts();
+			//setupAnts();
 
 			for (Ant ant : ants)
 			{
 				ArrayList<Integer> randomDataCounter = getRandomCounter();
 
 				int k = 0;
-				while (ant.finish())
+				while(ant.finish())
 				{
 					int dataIndex = randomDataCounter.get(k);
-
+					
 					ant.addWinner(dataIndex, moveAnt(ant, dataIndex));
 
 					ant.updateCenter(data);
@@ -192,6 +198,7 @@ public class ACO
 				
 				updatePheromones();
 				
+				System.out.println("FIT: " + ant.getFitness());
 				if(ant.getFitness() < best.getFitness())
 				{
 					best = new Ant(ant);

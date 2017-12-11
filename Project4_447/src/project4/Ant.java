@@ -74,6 +74,7 @@ public class Ant
     						attrCenters[cluster][attr] = 0;
     					}
     					attrCenters[cluster][attr] += data[instance][attr];
+    					//System.out.println("TOP: " + data[instance][attr] + " || " + attrCenters[cluster][attr]);
 					}
     				count++;
     			}
@@ -83,6 +84,7 @@ public class Ant
 				for(int attr = 0; attr < attrCenters[cluster].length; attr++)
 				{
 					attrCenters[cluster][attr] = attrCenters[cluster][attr] / count;
+					//System.out.println("BOT: " + count + " || " + attrCenters[cluster][attr]);
 				}
     		}
     	}
@@ -99,10 +101,10 @@ public class Ant
     	{
     		if(!visit)
     		{
-    			return false;
+    			return true;
     		}
     	}
-    	return true;
+    	return false;
     }
     
     public boolean[][] getActivation()
