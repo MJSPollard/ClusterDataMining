@@ -117,8 +117,12 @@ public class Handler {
 			{
 				un.train(data[i]);
 				un.evaluateOutput();
+				if(i % 100 == 0)
+				{
+					System.out.println(un.getFitness());
+				}
 			}
-			un.allWins();
+			un.showClusters();
 			break;
 		case 4:
 			PSO pos = new PSO();
@@ -158,15 +162,15 @@ public class Handler {
 			handler.getDataSet("Project4_447/src/resources/iris.csv", 150, 4);
 			break;
 		case 2:
-			handler.getDataSet("Project4_447/src/resources/wine_small.csv", 178, 14);
+			handler.getDataSet("src/resources/wine_small.csv", 178, 14);
 			break;
 		case 3:
-			handler.getDataSet("Project4_447/src/resources/wine_big.csv", 4898, 12);
+			handler.getDataSet("src/resources/wine_big.csv", 4898, 12);
 			break;
 		case 4:
 			radius = .001;
 			minPoints = 100;
-			handler.getDataSet("Project4_447/src/resources/htru_2.csv", 17898, 9);
+			handler.getDataSet("src/resources/htru_2.csv", 17898, 9);
 			break;
 		case 5:
 			handler.getDataSet("Project4_447/src/resources/student_eval.csv", 5820, 33);
