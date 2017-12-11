@@ -4,22 +4,25 @@ import java.util.ArrayList;
 
 public class Ant
 {
-	private ArrayList<Integer> trail;
 	private double[][] attrCenters;
+	private boolean[][] activation;
 	private boolean[] visited;
+	private double fitness;
+	
+	public Ant(Ant clone)
+	{
+		this.attrCenters = clone.attrCenters;
+		this.activation = clone.activation;
+		this.visited = clone.visited;
+		this.fitness = clone.fitness;
+	}
 	
 	public Ant(int instances, int attr, int clusters)
 	{
 		visited = new boolean[instances];
+		activation = new boolean[instances][clusters];
 		
 		attrCenters = new double[clusters][attr];
-		trail = new ArrayList<Integer>();
-	}
-	
-	public void visitCity(int city)
-	{
-	    trail.add(city);
-	    visited[city] = true;
 	}
 	 
 	public boolean visited(int i)
@@ -27,34 +30,30 @@ public class Ant
 	    return visited[i];
 	}
 	
-	public int getCurrentCity()
+	public void setFitness(double fitness)
 	{
-		return trail.get(trail.size()-1);
+		this.fitness = fitness;
 	}
-    public int trailLength()
-    {
-        return trail.size();
-    }
-    
-    public int[] getTrail()
-    {
-    	int[] arrayTrail = convertToArray(trail);
-    	return arrayTrail;
-    }
+	
+	public double getFitness()
+	{
+		return fitness;
+	}
+
     public void addWinner(int index, int winnerIndex)
     {
     	visited[index] = true;
-    	int loop = attrCenters[index].length;
+    	int loop = activation[index].length;
     	
     	for(int i = 0; i < loop; i++)
     	{
     		if(i == winnerIndex)
     		{
-    			attrCenters[index][i] = 1;
+    			activation[index][i] = true;
     		}
     		else
     		{
-    			attrCenters[index][i] = 0;
+    			activation[index][i] = false;
     		}
     	}
     }
@@ -79,12 +78,12 @@ public class Ant
     				count++;
     			}
     		}
-    		for(int attr = 0; attr < attrCenters[cluster].length; attr++)
+    		if(count != 0)
     		{
-    			if(count > 0)
-    			{
-    				attrCenters[cluster][attr] = attrCenters[cluster][attr] / count;
-    			}
+				for(int attr = 0; attr < attrCenters[cluster].length; attr++)
+				{
+					attrCenters[cluster][attr] = attrCenters[cluster][attr] / count;
+				}
     		}
     	}
     }
@@ -105,6 +104,11 @@ public class Ant
     	}
     	return true;
     }
+    
+    public boolean[][] getActivation()
+    {
+    	return activation;
+    }
 
     public void clear()
     {
@@ -112,7 +116,8 @@ public class Ant
         {
             visited[i] = false;
         }
-        trail = new ArrayList<Integer>();
+        
+        activation = new boolean[activation.length][activation[0].length];
     }
     
     /**
