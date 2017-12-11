@@ -35,7 +35,6 @@ public class Kmeans {
 		}
 
 		// mark the time and alert user
-		long startTime = System.currentTimeMillis();
 		System.out.println("K-Means clustering started");
 
 		// initialize random centers and assign the rest of the data to a cluster
@@ -54,9 +53,6 @@ public class Kmeans {
 			System.out.println("cluster2 size = " + cluster2.size());
 			i++;
 		}
-
-		long endTime = System.currentTimeMillis();
-		System.out.println("K-Means performed in " + (endTime - startTime) + " ms");
 
 	}
 

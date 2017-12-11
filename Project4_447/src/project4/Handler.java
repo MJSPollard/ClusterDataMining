@@ -11,6 +11,8 @@ public class Handler {
 	Scanner scan = new Scanner(System.in);
 	int count;
 	double[][] data;
+	double radius;
+	int minPoints;
 
 	/**
 	 * Main method for program
@@ -99,12 +101,14 @@ public class Handler {
 				+ "3. Unsupervised Competitive Neural Network\n" + "4. Particle Swarm Optimization\n"
 				+ "5. Ant Colony Optimization\n");
 		choice = Integer.parseInt(scan.nextLine());
+		long startTime = System.currentTimeMillis();
 		switch (choice) {
+
 		case 1:
 			Kmeans kmeans = new Kmeans(data, 2);
 			break;
 		case 2:
-			DBscan dbscan = new DBscan(data);
+			DBscan dbscan = new DBscan(data, radius, minPoints);
 			break;
 		case 3:
 			UnsupervisedNetwork un = new UnsupervisedNetwork(data[0].length, 2, .02);
@@ -129,6 +133,8 @@ public class Handler {
 			AlgorithmMenu();
 			break;
 		}
+		long endTime = System.currentTimeMillis();
+		System.out.println("Algorithm time to perform: " + (endTime - startTime) + " ms");
 
 	}
 
@@ -157,6 +163,8 @@ public class Handler {
 			handler.getDataSet("Project4_447/src/resources/wine_big.csv", 4898, 12);
 			break;
 		case 4:
+			radius = .001;
+			minPoints = 100;
 			handler.getDataSet("Project4_447/src/resources/htru_2.csv", 17898, 9);
 			break;
 		case 5:

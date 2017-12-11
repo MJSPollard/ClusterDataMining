@@ -9,8 +9,8 @@ public class DBscan {
 	// noise = points that are not core or border points
 
 	double data[][];
-	double radiusDistance = 0.001; // aka: theta
-	int minPoints = 100; // the mimimum amount of core point for a radius to be a cluster
+	double radiusDistance; // aka: theta
+	int minPoints; // the mimimum amount of core point for a radius to be a cluster
 	ArrayList<Double> dataList = new ArrayList<Double>();
 	ArrayList<Double> dataAroundCore = new ArrayList<Double>();
 	ArrayList<ArrayList<Double>> allClusters = new ArrayList<ArrayList<Double>>();
@@ -22,8 +22,10 @@ public class DBscan {
 	 * @param data
 	 *            - the input data set
 	 */
-	DBscan(double data[][]) {
+	DBscan(double data[][], double radiusDistance, int minPoints) {
 		this.data = data;
+		this.radiusDistance = radiusDistance;
+		this.minPoints = minPoints;
 		labelData = new double[data.length]; // variable that keeps track of indices of core points and border points
 		int coreCount = 0;
 		int borderCount = 0;
@@ -38,7 +40,6 @@ public class DBscan {
 			labelData[i] = 0;
 		}
 
-		long startTime = System.currentTimeMillis();
 		System.out.println("DB-Scan clustering started");
 		System.out.println("theta (radius) = " + radiusDistance);
 		System.out.println("min allowed points per original cluster = " + minPoints);
@@ -63,8 +64,6 @@ public class DBscan {
 		System.out.println("Expanded final clusters: ");
 		addDataAroundCoreToCluster();
 
-		long endTime = System.currentTimeMillis();
-		System.out.println("K-Means performed in " + (endTime - startTime) + " ms");
 	}
 
 	/**
