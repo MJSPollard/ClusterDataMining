@@ -6,16 +6,26 @@ import java.util.*;
 public class PSO
 {
 	ArrayList<Particle> swarm = new ArrayList<Particle>();
-	double data[][];
-	int clusterNum;
+	static double data[][];
+	static int clusterNum;
 	int swarmNum;
+	int closI = 0;
+	double closest;
 	double w = 0.729844;
 	double c1, c2 = 1.49618;
 	double phi = c1 + c2;
+	double r1, r2 = 0;
 	double chi = 2.0/Math.abs(2.0-phi-Math.sqrt(Math.pow(phi, 2)-4*phi));
+	double xMax = 3;
+	double xMin = 0;
+	double yMax = 3;
+	double yMin = 0;
+	double vMax = 1;
+	double vMin = 0;
 	int numPart = 10;
 	int numD = 2;
 	int numT = 100;
+	double gBestValue = -10000;
 	double[] pBestValue = new double[numPart];
     double[] gBestPosition = new double[numD];
     double[] bestFitnessHistory = new double[numT];
@@ -24,6 +34,7 @@ public class PSO
    double[][] pBestPosition = new double[numPart][numD];
    double[][] R = new double[numPart][numD];
    double[][] V = new double[numPart][numD];
+   double[][] clusterCenters;
 
 	ArrayList<Double> cluster1 = new ArrayList<Double>();
 	ArrayList<Double> cluster2 = new ArrayList<Double>();
@@ -51,22 +62,13 @@ public class PSO
 	}
 	}*/
 	
-	public static double fitness(double[] x){
-        double retValue = 0;
-
-        for(int i=0; i<x.length; i++){
-            retValue = calculateDistance(clusterNum, initializeCenters(data, clusterNum));            
-        }
-
-        return retValue;
-
-    }
+	
 
 	
 	public void runPSO(double data[][], int swarmNum, int clusterNum) {
 		Random rand = new Random();
 		this.data = data;
-		this.clusterNum = swarmNum;
+		this.clusterNum = clusterNum;
 		this.swarmNum = swarmNum;
 		//generatePSO();
 		int i = 0;
@@ -83,14 +85,90 @@ public class PSO
 		long startTime = System.currentTimeMillis();
 		System.out.println("PSO clustering started");
 		
+		initializeCenters(data, clusterNum);
 		
 		
 		double fitness[] = new double[10];
 		double bestLoc[] = new double[10];
 		ArrayList<XYClass> bestXY = new ArrayList<XYClass>();
 		
+		for(int j=0; j<numPart; j++){
+	         pBestValue[j] = 1000000; 
+	     }
+
+	     for(int j=0; j<numPart; j++){  
+	         for(int l=0; l<numD; l++){
+	             R[j][l] = xMin + (xMax-xMin)*rand.nextDouble();
+	             V[j][l] = vMin + (vMax-vMin)*rand.nextDouble();
+	             System.out.println(R[j][l]);
+	         }
+	     }
 		
-		while(i < swarmNum) {
+	     for(int j=0; j<numPart; j++){
+	            M[j] = fitness(R[j]);
+	         
+	        }
+
+	     for(int j=0; j<numT; j++){ 
+	            for(int p=0; p<numPart; p++){         
+	                for(int l=0; l<numD; l++){    
+	                    R[p][l] = R[p][l] + V[p][l];
+
+	                    if(R[p][l] > xMax)          { R[p][l] = xMax;}
+	                    else if(R[p][l] < xMin)     { R[p][l] = xMin;}
+	                }           
+	            }   
+
+	            for(int p=0; p<numPart; p++){ 
+
+	                M[p] = fitness(R[p]);
+	              
+	            
+	                if(M[p] > pBestValue[p]){
+	                
+	                     pBestValue[p] = M[p];
+	                     for(int l=0; l<numD; l++){
+	                        pBestPosition[p][l] = R[p][l];
+	                     }
+	                 }
+	                
+	                if(M[p] > gBestValue){
+	                    
+	                    gBestValue = M[p];          
+	                    for(int l=0; l<numD; l++){
+	                       gBestPosition[l] =  R[p][l];
+	                    }
+	                }
+	            
+	            }
+	            bestFitnessHistory[j] = gBestValue;
+	        
+	            w = yMax - ((yMax-yMin)/numT) * j;
+	           
+	            for(int p=0; p<numPart; p++){
+	                for(int l=0; l<numD; l++){
+	                    
+	                    r1 = rand.nextDouble();
+	                    r2 = rand.nextDouble();
+	                    V[p][l] = chi * w * (V[p][l] + r1 * c1 * (pBestPosition[p][l] - R[p][l]) + r2*c2 *(gBestPosition[l] - R[p][l]));
+	                    // classic Velocity update formulate 
+	                    
+	                    if      (V[p][l] > vMax) 
+	                    { V[p][l] = vMax; }        
+	                    
+	                    else if (V[p][l] < vMin) 
+	                    { V[p][l] = vMin; }
+	                }
+	            }
+	            //output global best value at current timestep
+	            System.out.println("iteration: " + j + " BestValue " + gBestValue);
+	        }   
+
+
+
+
+		
+		/*while(i < swarmNum) {
 			swarm.get(i).generateFitness();
 			fitness[i] = swarm.get(i).getFitness();
 			i++;
@@ -99,14 +177,27 @@ public class PSO
 		for (int k = 0; i < swarmNum; k++) {
 			 bestLoc[k] = fitness[k];
 			 bestXY.add(swarm.get(k).getLocation());
-			 }
-		System.out.println("done");
+			 }*/
+		long endTime = System.currentTimeMillis();
+		System.out.println("PSO performed in " + (endTime - startTime) + " ms");
 	}
+	
+	public double fitness(double[] in){
+        double retValue = 0;
+
+            retValue = calculateDistance(R, clusterNum, clusterCenters);            
+
+        return retValue;
+
+    }
+	
+	 
+
 	
 	public double[][] initializeCenters(double[][] data, int clusterNum) {
 
 		Random rand = new Random();
-		double[][] clusterCenters = new double[clusterNum][];
+		clusterCenters = new double[clusterNum][];
 
 		// randomly initialize the cluster centers to points in the data set
 		for (int i = 0; i < clusterNum; i++) {
@@ -128,13 +219,12 @@ public class PSO
 			System.out.println();
 
 		}
-
 		return clusterCenters;
 
 	}
 	
-	public double calculateDistance(double[][] data, int clusterNum, double[][] clusterCenters) {
-		int finalDistance = 0;
+	public double calculateDistance(double[][] R, int clusterNum, double[][] clusterCenters) {
+		double finalDistance = 0;
 		double dataSum = 0;
 		double dataAvg = 0;
 		double cenSum = 0;
@@ -157,11 +247,11 @@ public class PSO
 		// }
 		// System.out.println("cen size = " + cenList.size());
 
-		for (int instanceIT = 0; instanceIT < data.length; instanceIT++) {
-			for (int attrIT = 0; attrIT < data[0].length; attrIT++) {
-				dataSum += data[instanceIT][attrIT];
+		for (int instanceIT = 0; instanceIT < R.length; instanceIT++) {
+			for (int attrIT = 0; attrIT < R[0].length; attrIT++) {
+				dataSum += R[instanceIT][attrIT];
 			}
-			dataAvg = (dataSum / data[0].length);
+			dataAvg = (dataSum / R[0].length);
 			dataList.add(dataAvg);
 			dataSum = 0;
 		}
@@ -171,7 +261,7 @@ public class PSO
 		// System.out.println(dataList.get(i));
 		// }
 		// System.out.println("data size = " + dataList.size());
-
+		finalDistance = closest;
 		return finalDistance;
 	}
 
@@ -182,11 +272,10 @@ public class PSO
 		int dataIndex = 0;
 		int centerIndex = 0;
 
-		for (int i = 0; i < data.length; i++) {
-			double closest = 10000; // set to arbitrarily high number to be overwritten immediately
+		for (int i = 0; i < R[0].length; i++) {
+			closest = 10000; // set to arbitrarily high number to be overwritten immediately
 			for (int j = 0; j < clusterNum; j++) {
 				double num = Math.abs(cenList.get(j) - dataList.get(i));
-
 				if (num < closest) {
 					closest = num;
 					dataIndex = i;
@@ -196,6 +285,7 @@ public class PSO
 		}
 
 	}
+	
 	
 }
 
